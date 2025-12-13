@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../lib/firebase";
+import Link from "next/link";
 
 // Available tags for categorization
 const AVAILABLE_TAGS = [
@@ -220,6 +221,42 @@ export default function Home() {
         });
     } else {
       showToast(url, "info");
+    }
+  };
+
+  // Handle share details page - uses Web Share API or copies details URL
+  const handleShareDetails = (linkId, title) => {
+    const detailsUrl = `${window.location.origin}/link/${linkId}`;
+
+    // Try Web Share API first (mobile-friendly)
+    if (navigator.share) {
+      navigator.share({
+        title: title || 'Check out this link on SendTheLink!',
+        url: detailsUrl,
+      }).catch((err) => {
+        // User cancelled or error, fallback to clipboard
+        if (err.name !== 'AbortError') {
+          copyToClipboard(detailsUrl);
+        }
+      });
+    } else {
+      // Fallback: copy to clipboard
+      copyToClipboard(detailsUrl);
+    }
+  };
+
+  // Helper function to copy to clipboard
+  const copyToClipboard = (text) => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => {
+          showToast(`🔗 Details link copied!`, "success");
+        })
+        .catch(() => {
+          showToast(text, "info");
+        });
+    } else {
+      showToast(text, "info");
     }
   };
 
@@ -450,32 +487,53 @@ export default function Home() {
           )}
 
           {filteredLinks.map((item, index) => (
-            <div
+            <Link
               key={item.id}
+              href={`/link/${item.id}`}
               id={item.id}
-              className="glass-card p-5 fade-in-up"
+              className="glass-card p-5 fade-in-up block cursor-pointer hover:scale-[1.02] transition-transform duration-300"
               style={{ animationDelay: `${0.3 + index * 0.05}s` }}
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
                   From: <span style={{ color: 'var(--text-secondary)' }}>{item.from || "Anonymous"}</span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
+                  {/* Share Details Button */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleShareDetails(item.id, item.metaTitle);
+                    }}
+                    className="text-base px-3 py-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 transition font-bold"
+                    title="Share this content"
+                  >
+                    🔗 Share
+                  </button>
                   {/* Copy Link Button */}
                   <button
-                    onClick={() => handleCopyLink(item.url)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleCopyLink(item.url);
+                    }}
                     className="text-base px-3 py-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 transition font-bold"
-                    title="Copy link to clipboard"
+                    title="Copy original link to clipboard"
                   >
-                    📋 Copy Link
+                    📋 Copy
                   </button>
                   {/* Report Button */}
                   <button
-                    onClick={() => openReportModal(item.id)}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      openReportModal(item.id);
+                    }}
                     className="text-base px-3 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition font-bold"
                     title="Report inappropriate content"
                   >
-                    🚩 Report
+                    🚩
                   </button>
                 </div>
               </div>
@@ -500,10 +558,7 @@ export default function Home() {
               </p>
 
               {/* Link Preview Card */}
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noreferrer"
+              <div
                 className="flex items-center bg-white/10 rounded-xl overflow-hidden border border-white/20 hover:bg-white/20 transition group"
               >
                 {/* Thumbnail */}
@@ -525,12 +580,23 @@ export default function Home() {
                     {item.metaTitle}
                   </h3>
                   <p className="text-xs truncate mt-1" style={{ color: 'var(--text-muted)' }}>
-                    {new URL(item.url).hostname}
+                    {(() => {
+                      try {
+                        return new URL(item.url).hostname;
+                      } catch {
+                        return item.url;
+                      }
+                    })()}
                   </p>
                 </div>
-              </a>
+              </div>
 
-            </div>
+              {/* View Details Hint */}
+              <div className="mt-3 text-xs text-center" style={{ color: 'var(--text-muted)' }}>
+                👆 Click card "View Details"
+              </div>
+
+            </Link>
           ))}
         </div>
 
