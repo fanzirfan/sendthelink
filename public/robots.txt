@@ -1,0 +1,10 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://sendthelink.vercel.app/sitemap.xml
+
+# Block admin panel from search engines
+User-agent: *
+Disallow: /admin

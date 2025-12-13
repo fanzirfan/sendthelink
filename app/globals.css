@@ -1,0 +1,261 @@
+@import "tailwindcss";
+
+:root {
+  /* Glassmorphism Color Palette */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: rgba(0, 0, 0, 0.1);
+
+  /* Gradient Colors */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.5);
+
+  /* Background */
+  --background: linear-gradient(135deg, #1e3a8a 0%, #312e81 50%, #4c1d95 100%);
+  --foreground: #ffffff;
+}
+
+@theme inline {
+  --color-foreground: var(--foreground);
+}
+
+body {
+  margin-top: 35px;
+  background-color: #111927;
+  background-image:
+    radial-gradient(at 47% 33%, hsl(271.95, 94%, 23%) 0, transparent 59%),
+    radial-gradient(at 82% 65%, hsl(218.00, 39%, 11%) 0, transparent 55%);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism Base Classes */
+.glass {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background-color: rgba(34, 14, 53, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.125);
+  box-shadow: 0 8px 32px var(--glass-shadow);
+}
+
+.glass-card {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background-color: rgba(34, 14, 53, 0.75);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.125);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.4);
+}
+
+/* Button Styles */
+.btn-glass {
+  background: linear-gradient(135deg, hsl(271.95, 94%, 23%) 0%, hsl(271.95, 80%, 35%) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 14px 28px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(75, 20, 109, 0.4);
+}
+
+.btn-glass:hover {
+  background: linear-gradient(135deg, hsl(271.95, 94%, 28%) 0%, hsl(271.95, 80%, 40%) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(75, 20, 109, 0.6);
+}
+
+.btn-glass:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Input Styles */
+.input-glass {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: white;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.input-glass::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.input-glass:focus {
+  outline: none;
+  border-color: rgba(138, 43, 226, 0.6);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.2);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0) 100%);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Support Palestine Banner */
+.support-palestine,
+.support-palestine:visited {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  background: rgb(0, 0, 0);
+  display: flex;
+  justify-content: center;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  z-index: 10000;
+  text-decoration: none;
+  font-family: arial;
+}
+
+.support-palestine:hover,
+.support-palestine:active {
+  background: rgb(80, 80, 80);
+  text-decoration: none;
+}
+
+.support-palestine__flag {
+  margin-right: 10px;
+}
+
+.support-palestine__label {
+  color: white;
+  font-size: 12px;
+  line-height: 24px;
+}
+
+/* Tag Chip - Form Selector */
+.tag-chip {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.tag-chip:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.tag-chip.active {
+  background: linear-gradient(135deg, hsl(271.95, 94%, 23%) 0%, hsl(271.95, 80%, 35%) 100%);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 15px rgba(75, 20, 109, 0.4);
+}
+
+/* Tag Filter - Filter Buttons */
+.tag-filter {
+  padding: 6px 14px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(17, 25, 40, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.tag-filter:hover {
+  background: rgba(75, 20, 109, 0.3);
+  border-color: rgba(75, 20, 109, 0.4);
+  color: white;
+}
+
+.tag-filter.active {
+  background: rgba(75, 20, 109, 0.5);
+  border-color: rgba(75, 20, 109, 0.7);
+  color: white;
+}
+
+/* Tag Display - On Cards */
+.tag-display {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
