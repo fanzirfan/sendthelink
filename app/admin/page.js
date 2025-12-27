@@ -25,11 +25,12 @@ export default function AdminPanel() {
     const [password, setPassword] = useState("");
     const [links, setLinks] = useState([]);
     const [filteredLinks, setFilteredLinks] = useState([]);
-    const [filter, setFilter] = useState("all"); // all, reported, flagged
+    const [filter, setFilter] = useState("all"); // all, reported, flagged, security
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(false);
     const [editingLink, setEditingLink] = useState(null);
     const [editTags, setEditTags] = useState([]); // For tag editing in modal
+    const [editStatus, setEditStatus] = useState('approved'); // For status editing
     const [deleteConfirm, setDeleteConfirm] = useState(null); // For custom delete modal
 
     // Check for existing auth in localStorage
@@ -50,6 +51,12 @@ export default function AdminPanel() {
             filtered = filtered.filter(link => (link.reportCount || 0) > 0);
         } else if (filter === "flagged") {
             filtered = filtered.filter(link => link.status === "flagged");
+        } else if (filter === "security") {
+            filtered = filtered.filter(link =>
+                link.securityStatus === 'suspicious' ||
+                link.securityStatus === 'malicious' ||
+                link.status === 'pending_review'
+            );
         }
 
         // Apply search
@@ -230,7 +237,7 @@ export default function AdminPanel() {
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                     <div className="glass-card p-5">
                         <div className="text-3xl font-bold">{links.length}</div>
                         <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Total Links</div>
@@ -246,6 +253,12 @@ export default function AdminPanel() {
                             {links.filter(l => l.status === 'flagged').length}
                         </div>
                         <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Flagged Links</div>
+                    </div>
+                    <div className="glass-card p-5">
+                        <div className="text-3xl font-bold text-orange-300">
+                            {links.filter(l => l.securityStatus === 'suspicious' || l.securityStatus === 'malicious').length}
+                        </div>
+                        <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>🛡️ Security Review</div>
                     </div>
                 </div>
 
@@ -274,6 +287,13 @@ export default function AdminPanel() {
                                     }`}
                             >
                                 Flagged
+                            </button>
+                            <button
+                                onClick={() => setFilter("security")}
+                                className={`px-4 py-2 rounded-lg transition ${filter === "security" ? "bg-orange-500" : "bg-white/10 hover:bg-white/20"
+                                    }`}
+                            >
+                                🛡️ Security
                             </button>
                         </div>
 
@@ -327,7 +347,8 @@ export default function AdminPanel() {
                                     from: formData.get('from'),
                                     message: formData.get('message'),
                                     url: formData.get('url'),
-                                    tags: editTags
+                                    tags: editTags,
+                                    status: editStatus
                                 };
                                 handleUpdate(editingLink.id, updates);
                             }} className="space-y-4">
@@ -392,6 +413,20 @@ export default function AdminPanel() {
                                     )}
                                 </div>
 
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">📋 Status:</label>
+                                    <select
+                                        value={editStatus}
+                                        onChange={(e) => setEditStatus(e.target.value)}
+                                        className="input-glass w-full cursor-pointer"
+                                    >
+                                        <option value="approved" className="bg-gray-900">✅ Approved (Visible)</option>
+                                        <option value="pending_review" className="bg-gray-900">🔍 Pending Review (Hidden)</option>
+                                        <option value="flagged" className="bg-gray-900">🚩 Flagged (Hidden)</option>
+                                        <option value="rejected" className="bg-gray-900">❌ Rejected (Hidden)</option>
+                                    </select>
+                                </div>
+
                                 <div className="flex gap-3 pt-4">
                                     <button
                                         type="submit"
@@ -429,6 +464,7 @@ export default function AdminPanel() {
                                     <th className="text-left p-3">Tags</th>
                                     <th className="text-left p-3">URL</th>
                                     <th className="text-left p-3">Reports</th>
+                                    <th className="text-left p-3">Security</th>
                                     <th className="text-left p-3">Status</th>
                                     <th className="text-left p-3">Actions</th>
                                 </tr>
@@ -473,6 +509,19 @@ export default function AdminPanel() {
                                             </span>
                                         </td>
                                         <td className="p-3 text-sm">
+                                            <span className={`px-2 py-1 rounded text-xs ${link.securityStatus === 'malicious' ? 'bg-red-500/20 text-red-300' :
+                                                link.securityStatus === 'suspicious' ? 'bg-orange-500/20 text-orange-300' :
+                                                    link.securityStatus === 'safe' ? 'bg-green-500/20 text-green-300' :
+                                                        'bg-gray-500/20 text-gray-300'
+                                                }`}>
+                                                {link.securityStatus === 'malicious' ? '🚨 Malicious' :
+                                                    link.securityStatus === 'suspicious' ? '⚠️ Suspicious' :
+                                                        link.securityStatus === 'safe' ? '✅ Safe' :
+                                                            link.securityStatus === 'pending' ? '🔄 Scanning' :
+                                                                '❓ Unknown'}
+                                            </span>
+                                        </td>
+                                        <td className="p-3 text-sm">
                                             <span className={`px-2 py-1 rounded text-xs ${link.status === 'flagged' ? 'bg-red-500/20 text-red-300' :
                                                 link.status === 'rejected' ? 'bg-gray-500/20 text-gray-300' :
                                                     'bg-green-500/20 text-green-300'
@@ -486,6 +535,7 @@ export default function AdminPanel() {
                                                     onClick={() => {
                                                         setEditingLink(link);
                                                         setEditTags(link.tags || []);
+                                                        setEditStatus(link.status || 'approved');
                                                     }}
                                                     className="text-xs px-3 py-1 rounded bg-blue-500/20 hover:bg-blue-500/30 transition"
                                                     title="Edit"

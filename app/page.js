@@ -66,7 +66,7 @@ export default function Home() {
     const q = query(collection(db, "shared_links"), orderBy("createdAt", "desc"));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const linksData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      // Filter out rejected/flagged links from public view  
+      // Filter out rejected/flagged/pending_review links from public view  
       const approvedLinks = linksData.filter(link =>
         !link.status || link.status === 'approved'
       );
@@ -198,7 +198,7 @@ export default function Home() {
 
       // Reset form
       setForm({ from: "", message: "", url: "", isAnonymous: false, tags: [] });
-      showToast("✅ Link shared successfully!", "success");
+      showToast("✅ Link shared successfully!\n🔍 Link is being scanned for security, please wait...", "success");
 
     } catch (error) {
       console.error(error);
