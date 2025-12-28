@@ -508,14 +508,18 @@ export default function Home() {
               className="glass-card p-5 fade-in-up block cursor-pointer hover:scale-[1.02] transition-transform duration-300"
               style={{ animationDelay: `${0.3 + index * 0.05}s` }}
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="text-xs font-bold uppercase tracking-wider flex items-center gap-2" style={{ color: 'var(--text-muted)' }}>
-                  From: <span style={{ color: 'var(--text-secondary)' }}>{item.from || "Anonymous"}</span>
+              <div className="mb-3">
+                {/* Top row: From + Verified badge */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
+                    From: <span style={{ color: 'var(--text-secondary)' }}>{item.from || "Anonymous"}</span>
+                  </span>
                   {item.isVerified && (
-                    <span className="verified-badge">✓ Verified</span>
+                    <span className="verified-icon" title="Verified">✓</span>
                   )}
                 </div>
-                <div className="flex gap-2 flex-wrap">
+                {/* Buttons row */}
+                <div className="flex gap-2">
                   {/* Share Details Button */}
                   <button
                     onClick={(e) => {
@@ -523,10 +527,10 @@ export default function Home() {
                       e.stopPropagation();
                       handleShareDetails(item.id, item.metaTitle);
                     }}
-                    className="text-base px-3 py-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 transition font-bold"
+                    className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 transition font-semibold"
                     title="Share this content"
                   >
-                    🔗 Share
+                    🔗 <span className="hidden sm:inline">Share</span>
                   </button>
                   {/* Copy Link Button */}
                   <button
@@ -535,10 +539,10 @@ export default function Home() {
                       e.stopPropagation();
                       handleCopyLink(item.url);
                     }}
-                    className="text-base px-3 py-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 transition font-bold"
+                    className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 transition font-semibold"
                     title="Copy original link to clipboard"
                   >
-                    📋 Copy
+                    📋 <span className="hidden sm:inline">Copy</span>
                   </button>
                   {/* Report Button */}
                   <button
@@ -547,7 +551,7 @@ export default function Home() {
                       e.stopPropagation();
                       openReportModal(item.id);
                     }}
-                    className="text-base px-3 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition font-bold"
+                    className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition font-semibold"
                     title="Report inappropriate content"
                   >
                     🚩
