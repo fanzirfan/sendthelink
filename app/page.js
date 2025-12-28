@@ -311,12 +311,14 @@ export default function Home() {
 
         {/* Toast Notification */}
         {toast && (
-          <div className={`fixed top-4 right-4 z-50 glass-card p-4 max-w-md animate-slide-in ${toast.type === 'error' ? 'border-red-500' :
-            toast.type === 'success' ? 'border-green-500' :
-              toast.type === 'warning' ? 'border-yellow-500' :
-                'border-blue-500'
-            } border-l-4`}>
-            <p className="text-sm whitespace-pre-line">{toast.message}</p>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+            <div className={`glass-card p-6 md:p-8 w-full max-w-sm md:max-w-lg animate-toast-popup pointer-events-auto ${toast.type === 'error' ? 'border-red-500' :
+              toast.type === 'success' ? 'border-green-500' :
+                toast.type === 'warning' ? 'border-yellow-500' :
+                  'border-blue-500'
+              } border-l-4 text-center shadow-2xl`}>
+              <p className="text-base md:text-lg font-medium whitespace-pre-line">{toast.message}</p>
+            </div>
           </div>
         )}
 
@@ -635,6 +637,19 @@ export default function Home() {
         }
         .animate-slide-in {
           animation: slide-in 0.3s ease-out;
+        }
+        @keyframes toast-popup {
+          from {
+            transform: scale(0.8);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
+        }
+        .animate-toast-popup {
+          animation: toast-popup 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
       `}</style>
     </main>
