@@ -328,17 +328,25 @@ body {
   transform: translateZ(0);
 }
 
-/* Touch Target Optimization - Minimum 48x48px */
-.btn-glass,
-button,
-a.btn-glass,
+/* Touch Target Optimization - Only for main action buttons */
+.btn-glass {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+/* Tag chips - slightly smaller touch targets */
 .tag-chip,
-.tag-filter,
+.tag-filter {
+  touch-action: manipulation;
+}
+
+/* Checkbox styling - keep normal size */
 input[type="checkbox"],
 input[type="radio"] {
-  min-height: 48px;
-  min-width: 48px;
-  touch-action: manipulation;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary);
 }
 
 /* Improved mobile input styles */
@@ -380,8 +388,8 @@ html {
   /* Larger touch targets on mobile */
   .tag-chip,
   .tag-filter {
-    min-height: 44px;
-    padding: 10px 16px;
+    padding: 8px 12px;
+    font-size: 12px;
   }
 
   /* Optimize scrolling performance */
