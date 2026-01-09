@@ -658,13 +658,13 @@ export default function Home() {
               🔍 Scanned by URLScan.io
             </a>
             <span className="text-xs" style={{ color: 'var(--text-muted)' }}>•</span>
-            <Link
+            <a
               href="/analytics-policy"
               className="text-xs hover:text-white transition-colors flex items-center gap-1"
               style={{ color: 'var(--text-secondary)' }}
             >
               📊 Analytics Policy
-            </Link>
+            </a>
           </div>
 
           <p className="text-xs mt-4" style={{ color: 'var(--text-muted)' }}>
