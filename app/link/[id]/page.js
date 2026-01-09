@@ -6,6 +6,12 @@ import { db } from "../../../lib/firebase";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 
+// Helper function to validate image URLs
+const isValidImageUrl = (url) => {
+    if (!url || typeof url !== 'string') return false;
+    return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:');
+};
+
 // Available tags for categorization
 const AVAILABLE_TAGS = [
     { id: '3d', label: '3D Assets', emoji: '🎮' },
@@ -343,12 +349,14 @@ export default function LinkDetailsPage() {
                             className="block bg-white/10 rounded-xl overflow-hidden border border-white/20 hover:bg-white/20 transition group"
                         >
                             {/* Large Preview Image */}
-                            {linkData.metaImage && (
+                            {isValidImageUrl(linkData.metaImage) && (
                                 <div className="w-full h-48 md:h-64 relative overflow-hidden bg-white/5">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
                                         src={linkData.metaImage}
                                         alt="preview"
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                        onError={(e) => { e.target.style.display = 'none'; }}
                                     />
                                 </div>
                             )}

@@ -1,9 +1,15 @@
 // app/page.js
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import Link from "next/link";
+
+// Helper function to validate image URLs
+const isValidImageUrl = (url) => {
+  if (!url || typeof url !== 'string') return false;
+  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:');
+};
 
 // Available tags for categorization
 const AVAILABLE_TAGS = [
@@ -584,11 +590,14 @@ export default function Home() {
               >
                 {/* Thumbnail */}
                 <div className="w-20 h-20 bg-white/5 flex-shrink-0 relative overflow-hidden">
-                  {item.metaImage ? (
+                  {isValidImageUrl(item.metaImage) ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={item.metaImage}
                       alt="preview"
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      loading="lazy"
+                      onError={(e) => { e.target.style.display = 'none'; }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-2xl">🔗</div>

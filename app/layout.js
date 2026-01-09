@@ -4,6 +4,9 @@ import "./globals.css";
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
+  display: "swap", // Faster text rendering - prevent FOIT
+  preload: true,
+  adjustFontFallback: true,
 });
 
 export const metadata = {
@@ -61,9 +64,8 @@ export const metadata = {
     creator: "@sendthelink"
   },
 
-  // App manifest & theme
+  // App manifest
   manifest: "/manifest.json",
-  themeColor: "#110820",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -93,6 +95,14 @@ export const metadata = {
       "max-snippet": -1
     }
   },
+
+  // Additional mobile optimization
+  formatDetection: {
+    telephone: true,
+    date: false,
+    address: false,
+    email: true,
+  },
   verification: {
     // Add your verification codes here
     // google: "your-google-verification-code",
@@ -100,9 +110,35 @@ export const metadata = {
   }
 };
 
+// Viewport configuration (Next.js 16+ requirement)
+export const viewport = {
+  themeColor: "#110820",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {/* Preconnect to critical third-party origins for faster loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://firestore.googleapis.com" />
+        <link rel="preconnect" href="https://www.google.com" />
+        <link rel="preconnect" href="https://www.gstatic.com" />
+
+        {/* DNS Prefetch for secondary resources */}
+        <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com" />
+        <link rel="dns-prefetch" href="https://generativelanguage.googleapis.com" />
+
+        {/* Optimize for mobile */}
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="format-detection" content="telephone=no" />
+      </head>
       <body
         className={`${jetbrainsMono.variable} antialiased`}
       >

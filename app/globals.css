@@ -309,3 +309,167 @@ body {
   font-size: 11px;
   box-shadow: 0 2px 6px rgba(29, 155, 240, 0.4);
 }
+
+/* ================================================
+   MOBILE PERFORMANCE OPTIMIZATIONS
+   ================================================ */
+
+/* Content Visibility - Lazy render offscreen content */
+.glass-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 300px;
+}
+
+/* GPU-accelerated animations for smoother mobile performance */
+.fade-in-up,
+.animate-slide-in,
+.animate-toast-popup {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* Touch Target Optimization - Minimum 48x48px */
+.btn-glass,
+button,
+a.btn-glass,
+.tag-chip,
+.tag-filter,
+input[type="checkbox"],
+input[type="radio"] {
+  min-height: 48px;
+  min-width: 48px;
+  touch-action: manipulation;
+}
+
+/* Improved mobile input styles */
+.input-glass {
+  font-size: 16px;
+  /* Prevents iOS zoom on focus */
+  touch-action: manipulation;
+}
+
+/* Prevent text size adjustment on mobile */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Reduce motion for users who prefer it (accessibility + performance) */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .fade-in-up,
+  .animate-slide-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+
+  /* Larger touch targets on mobile */
+  .tag-chip,
+  .tag-filter {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+
+  /* Optimize scrolling performance */
+  body {
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+  }
+
+  /* Reduce complexity of glass effects on mobile */
+  .glass-card {
+    box-shadow: 0 2px 8px oklch(0 0 0 / 15%);
+  }
+
+  .glass-card:hover {
+    transform: none;
+    /* Disable hover transform on mobile */
+    box-shadow: 0 2px 8px oklch(0 0 0 / 15%);
+  }
+
+  /* Simplify animations on mobile for better performance */
+  .fade-in-up {
+    animation-duration: 0.2s;
+  }
+
+  /* Better tap feedback */
+  button:active,
+  .btn-glass:active,
+  a:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+
+  /* Optimize image rendering on mobile */
+  img {
+    image-rendering: optimizeSpeed;
+  }
+
+  /* Responsive font sizes for mobile */
+  h1 {
+    font-size: 1.75rem !important;
+    line-height: 1.2;
+  }
+
+  /* Better spacing on mobile */
+  .glass-card {
+    padding: 16px;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 375px) {
+
+  .tag-chip,
+  .tag-filter {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+
+  .btn-glass {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  /* Even more compact spacing */
+  .glass-card {
+    padding: 12px;
+  }
+}
+
+/* High DPI screens - optimize for retina */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+  img {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Optimize paint for fixed elements */
+.support-palestine {
+  will-change: auto;
+  contain: layout style;
+}
