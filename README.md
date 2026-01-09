@@ -22,6 +22,7 @@
 - ✅ **Content Moderation** - Pattern-based filtering (spam, adult, gambling)
 - ✅ **XSS Protection** - All inputs sanitized
 - ✅ **Security Headers** - CSP, X-Frame-Options, HSTS, etc.
+- ✅ **Privacy-First Analytics** - Vercel Analytics (GDPR compliant, no cookies)
 
 ### ✓ **Verified User System**
 - ✅ **Verified Badge** - Blue checkmark for trusted users (like Twitter/Meta)
@@ -256,6 +257,7 @@ This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file
 - [URLScan.io](https://urlscan.io/) - URL analysis
 - [Vercel](https://vercel.com/) - Hosting platform
 - [reCAPTCHA](https://www.google.com/recaptcha/) - Bot protection
+- [Vercel Analytics](https://vercel.com/analytics) - Privacy-friendly analytics
 
 ---
 
@@ -273,7 +275,9 @@ This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file
 - [x] ~~Collections/categories~~ → **Tags system implemented!**
 - [x] ~~Security scanning~~ → **VirusTotal & URLScan.io integrated!**
 - [x] ~~Verified users~~ → **Verified badge system implemented!**
-- [ ] Link analytics
+- [x] ~~Verified users~~ → **Verified badge system implemented!**
+- [x] **Website Analytics** (Vercel Analytics)
+- [ ] Link analytics (Per-link stats)
 - [ ] Custom short URLs
 - [ ] API for third-party integrations
 - [ ] Mobile app (React Native)
