@@ -17,8 +17,16 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
         }
 
-        // Special handling for X.com/Twitter (they block scraping)
+        // SSRF Protection: Block private/local IP ranges and localhost
         const hostname = validUrl.hostname;
+        if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' ||
+            hostname.startsWith('10.') ||
+            hostname.startsWith('192.168.') ||
+            (hostname.startsWith('172.') && parseInt(hostname.split('.')[1], 10) >= 16 && parseInt(hostname.split('.')[1], 10) <= 31)) {
+            return NextResponse.json({ error: 'Internal/Private URLs are not allowed' }, { status: 403 });
+        }
+
+        // Special handling for X.com/Twitter (they block scraping)
         if (hostname === 'x.com' || hostname === 'www.x.com' ||
             hostname === 'twitter.com' || hostname === 'www.twitter.com') {
             return handleTwitterPreview(url);
