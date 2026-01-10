@@ -2,6 +2,26 @@
 import { NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 
+// SSRF protection: restrict outgoing requests to a controlled set of domains.
+// Adjust these lists according to the domains you actually want to support.
+const ALLOWED_HOSTNAMES = [
+    // Exact hostnames, e.g. 'example.com', 'www.example.com'
+];
+const ALLOWED_DOMAIN_SUFFIXES = [
+    // Public suffixes you consider safe to allow, e.g. '.example.com'
+];
+
+function isHostnameAllowed(hostname) {
+    if (ALLOWED_HOSTNAMES.length > 0 && ALLOWED_HOSTNAMES.includes(hostname)) {
+        return true;
+    }
+    if (ALLOWED_DOMAIN_SUFFIXES.length > 0) {
+        return ALLOWED_DOMAIN_SUFFIXES.some((suffix) => hostname.endsWith(suffix));
+    }
+    // If no allow-list entries are configured, deny by default.
+    return false;
+}
+
 export async function POST(request) {
     try {
         const { url } = await request.json();
@@ -26,6 +46,11 @@ export async function POST(request) {
 
         if (isIpAddress || isLocal) {
             return NextResponse.json({ error: 'Direct IP access and local domains are not allowed. Please use a valid public domain.' }, { status: 403 });
+        }
+
+        // Enforce allow-list: only fetch from explicitly permitted hostnames/domains
+        if (!isHostnameAllowed(hostname)) {
+            return NextResponse.json({ error: 'Preview for this domain is not allowed.' }, { status: 403 });
         }
 
         // Special handling for X.com/Twitter (they block scraping)
