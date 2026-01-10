@@ -7,9 +7,15 @@ import { collection, getDocs, deleteDoc, updateDoc, doc, query, orderBy } from '
 import { db } from '../../../../lib/firebase';
 
 // Simple auth check
+import { verifyToken } from '../../../../lib/adminAuth';
+
+// Simple auth check
 function isAuthenticated(request) {
     const authHeader = request.headers.get('authorization');
-    return authHeader === `Bearer ${process.env.ADMIN_PASSWORD}`;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) return false;
+
+    const token = authHeader.split(' ')[1];
+    return verifyToken(token);
 }
 
 export async function GET(request) {

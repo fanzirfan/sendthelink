@@ -6,13 +6,21 @@ export async function POST(request) {
     try {
         const { url } = await request.json();
 
-        // Simple URL validation
-        if (!url || !url.startsWith('http')) {
+        // Strict URL validation
+        let validUrl;
+        try {
+            validUrl = new URL(url);
+            if (validUrl.protocol !== 'http:' && validUrl.protocol !== 'https:') {
+                throw new Error('Invalid protocol');
+            }
+        } catch (e) {
             return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
         }
 
         // Special handling for X.com/Twitter (they block scraping)
-        if (url.includes('x.com/') || url.includes('twitter.com/')) {
+        const hostname = validUrl.hostname;
+        if (hostname === 'x.com' || hostname === 'www.x.com' ||
+            hostname === 'twitter.com' || hostname === 'www.twitter.com') {
             return handleTwitterPreview(url);
         }
 
@@ -20,7 +28,7 @@ export async function POST(request) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
 
-        const res = await fetch(url, {
+        const res = await fetch(validUrl.toString(), {
             signal: controller.signal,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (compatible; SendTheLink/1.0; +https://sendthelink.vercel.app)'

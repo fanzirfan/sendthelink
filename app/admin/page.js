@@ -36,8 +36,8 @@ export default function AdminPanel() {
 
     // Check for existing auth in localStorage
     useEffect(() => {
-        const auth = localStorage.getItem('adminAuth');
-        if (auth) {
+        const token = localStorage.getItem('adminToken');
+        if (token) {
             setAuthenticated(true);
             fetchLinks();
         }
@@ -91,7 +91,7 @@ export default function AdminPanel() {
             const data = await res.json();
 
             if (data.success) {
-                localStorage.setItem('adminAuth', password);
+                localStorage.setItem('adminToken', data.token);
                 setAuthenticated(true);
                 setPassword("");
                 fetchLinks();
@@ -109,13 +109,13 @@ export default function AdminPanel() {
     const fetchLinks = async () => {
         setLoading(true);
         try {
-            const authToken = localStorage.getItem('adminAuth');
+            const authToken = localStorage.getItem('adminToken');
             const res = await fetch('/api/admin/links', {
                 headers: { 'Authorization': `Bearer ${authToken}` }
             });
 
             if (res.status === 401) {
-                localStorage.removeItem('adminAuth');
+                localStorage.removeItem('adminToken');
                 setAuthenticated(false);
                 return;
             }
@@ -130,7 +130,7 @@ export default function AdminPanel() {
 
     const handleDelete = async (linkId) => {
         try {
-            const authToken = localStorage.getItem('adminAuth');
+            const authToken = localStorage.getItem('adminToken');
             const res = await fetch('/api/admin/links', {
                 method: 'DELETE',
                 headers: {
@@ -155,7 +155,7 @@ export default function AdminPanel() {
 
     const handleUpdate = async (linkId, updates) => {
         try {
-            const authToken = localStorage.getItem('adminAuth');
+            const authToken = localStorage.getItem('adminToken');
             const res = await fetch('/api/admin/links', {
                 method: 'PATCH',
                 headers: {
@@ -179,7 +179,7 @@ export default function AdminPanel() {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('adminAuth');
+        localStorage.removeItem('adminToken');
         setAuthenticated(false);
         setLinks([]);
     };
@@ -523,9 +523,9 @@ export default function AdminPanel() {
                                             </div>
                                             <div className="flex gap-1">
                                                 <span className={`px-2 py-0.5 rounded text-xs ${link.securityStatus === 'malicious' ? 'bg-red-500/20 text-red-300' :
-                                                        link.securityStatus === 'suspicious' ? 'bg-orange-500/20 text-orange-300' :
-                                                            link.securityStatus === 'safe' ? 'bg-green-500/20 text-green-300' :
-                                                                'bg-gray-500/20 text-gray-300'
+                                                    link.securityStatus === 'suspicious' ? 'bg-orange-500/20 text-orange-300' :
+                                                        link.securityStatus === 'safe' ? 'bg-green-500/20 text-green-300' :
+                                                            'bg-gray-500/20 text-gray-300'
                                                     }`}>
                                                     {link.securityStatus === 'malicious' ? '🚨' :
                                                         link.securityStatus === 'suspicious' ? '⚠️' :
@@ -533,8 +533,8 @@ export default function AdminPanel() {
                                                                 link.securityStatus === 'pending' ? '🔄' : '❓'}
                                                 </span>
                                                 <span className={`px-2 py-0.5 rounded text-xs ${link.status === 'flagged' ? 'bg-red-500/20 text-red-300' :
-                                                        link.status === 'rejected' ? 'bg-gray-500/20 text-gray-300' :
-                                                            'bg-green-500/20 text-green-300'
+                                                    link.status === 'rejected' ? 'bg-gray-500/20 text-gray-300' :
+                                                        'bg-green-500/20 text-green-300'
                                                     }`}>
                                                     {link.status === 'flagged' ? '🚩' : link.status === 'rejected' ? '❌' : '✅'}
                                                 </span>

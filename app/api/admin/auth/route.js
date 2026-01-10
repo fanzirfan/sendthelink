@@ -1,5 +1,5 @@
-// app/api/admin/auth/route.js
 import { NextResponse } from 'next/server';
+import { generateToken } from '../../../../lib/adminAuth';
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
@@ -14,10 +14,11 @@ export async function POST(request) {
         }
 
         if (password === ADMIN_PASSWORD) {
-            // In production, you'd want to use JWT tokens or sessions
-            // For now, we'll just return success and let client store auth state
+            const token = generateToken();
+
             return NextResponse.json({
                 success: true,
+                token: token,
                 message: 'Authentication successful'
             });
         }

@@ -21,7 +21,7 @@ export async function POST(request) {
         // Run the security scan
         const scanResult = await checkURLSecurity(url);
 
-        console.log(`[Security Scan] Result for ${linkId}:`, {
+        console.log('[Security Scan] Result for link:', linkId, {
             status: scanResult.securityStatus,
             duration: scanResult.scanDuration
         });
