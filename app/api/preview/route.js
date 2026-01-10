@@ -5,10 +5,15 @@ import * as cheerio from 'cheerio';
 // SSRF protection: restrict outgoing requests to a controlled set of domains.
 // Adjust these lists according to the domains you actually want to support.
 const ALLOWED_HOSTNAMES = [
-    // Exact hostnames, e.g. 'example.com', 'www.example.com'
+    // Exact hostnames explicitly allowed for link previews.
+    // Example: your own app domains or other trusted services.
+    'sendthelink.vercel.app',
+    'www.sendthelink.vercel.app',
 ];
 const ALLOWED_DOMAIN_SUFFIXES = [
     // Public suffixes you consider safe to allow, e.g. '.example.com'
+    // This allows any subdomain of the listed suffixes.
+    '.sendthelink.vercel.app',
 ];
 
 function isHostnameAllowed(hostname) {
