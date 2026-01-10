@@ -17,13 +17,15 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
         }
 
-        // SSRF Protection: Block private/local IP ranges and localhost
+        // SSRF Protection: Strict Domain Validation
+        // We reject any URL that looks like an IP address (IPv4 or IPv6) or local domain
         const hostname = validUrl.hostname;
-        if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' ||
-            hostname.startsWith('10.') ||
-            hostname.startsWith('192.168.') ||
-            (hostname.startsWith('172.') && parseInt(hostname.split('.')[1], 10) >= 16 && parseInt(hostname.split('.')[1], 10) <= 31)) {
-            return NextResponse.json({ error: 'Internal/Private URLs are not allowed' }, { status: 403 });
+
+        const isIpAddress = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) || hostname.startsWith('[') || hostname.includes(':');
+        const isLocal = hostname === 'localhost' || hostname.endsWith('.local') || hostname.endsWith('.internal');
+
+        if (isIpAddress || isLocal) {
+            return NextResponse.json({ error: 'Direct IP access and local domains are not allowed. Please use a valid public domain.' }, { status: 403 });
         }
 
         // Special handling for X.com/Twitter (they block scraping)
