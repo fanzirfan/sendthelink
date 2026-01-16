@@ -633,7 +633,7 @@ export default function Home() {
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-white/10 text-center fade-in-up">
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            © 2025 SendTheLink • Share knowledge freely
+            © {new Date().getFullYear()} SendTheLink • Share knowledge freely
           </p>
 
           {/* Security Credits */}

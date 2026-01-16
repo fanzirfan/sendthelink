@@ -394,7 +394,7 @@ export default function LinkDetailsPage() {
                 {/* Footer */}
                 <footer className="mt-12 pt-8 border-t border-white/10 text-center fade-in-up">
                     <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                        © 2025 SendTheLink • Share knowledge freely
+                        © {new Date().getFullYear()} SendTheLink • Share knowledge freely
                     </p>
                 </footer>
 
