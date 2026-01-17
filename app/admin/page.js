@@ -32,7 +32,9 @@ export default function AdminPanel() {
     const [editTags, setEditTags] = useState([]); // For tag editing in modal
     const [editStatus, setEditStatus] = useState('approved'); // For status editing
     const [editVerified, setEditVerified] = useState(false); // For verified editing
-    const [deleteConfirm, setDeleteConfirm] = useState(null); // For custom delete modal
+const [deleteConfirm, setDeleteConfirm] = useState(null); // For custom delete modal
+    const [refreshingPreviews, setRefreshingPreviews] = useState(false); // For refresh previews
+    const [previewResult, setPreviewResult] = useState(null); // For showing refresh result
 
     // Check for existing auth in localStorage
     useEffect(() => {
@@ -178,10 +180,57 @@ export default function AdminPanel() {
         }
     };
 
-    const handleLogout = () => {
+const handleLogout = () => {
         localStorage.removeItem('adminToken');
         setAuthenticated(false);
         setLinks([]);
+    };
+
+    // Refresh all missing previews
+    const handleRefreshPreviews = async () => {
+        setRefreshingPreviews(true);
+        setPreviewResult(null);
+        try {
+            const authToken = localStorage.getItem('adminToken');
+            const res = await fetch('/api/admin/refresh-previews', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({})
+            });
+
+            if (res.status === 401) {
+                localStorage.removeItem('adminToken');
+                setAuthenticated(false);
+                return;
+            }
+
+            const data = await res.json();
+            if (data.success) {
+                setPreviewResult({
+                    type: 'success',
+                    message: `✅ Refreshed ${data.summary.refreshed} previews (${data.summary.skipped} skipped, ${data.summary.failed} failed)`
+                });
+                fetchLinks(); // Reload to show updated previews
+            } else {
+                setPreviewResult({
+                    type: 'error',
+                    message: `❌ ${data.error || 'Failed to refresh previews'}`
+                });
+            }
+        } catch (error) {
+            console.error('Refresh previews error:', error);
+            setPreviewResult({
+                type: 'error',
+                message: '❌ Network error. Please try again.'
+            });
+        }
+        setRefreshingPreviews(false);
+
+        // Auto-hide result after 5 seconds
+        setTimeout(() => setPreviewResult(null), 5000);
     };
 
     // Login Screen
@@ -225,7 +274,15 @@ export default function AdminPanel() {
                         <h1 className="text-2xl md:text-4xl font-bold mb-1">Admin Dashboard</h1>
                         <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Manage shared links</p>
                     </div>
-                    <div className="flex gap-2">
+<div className="flex gap-2">
+                        <button
+                            onClick={handleRefreshPreviews}
+                            disabled={refreshingPreviews}
+                            className="px-3 py-2 text-sm rounded-lg bg-green-500/20 hover:bg-green-500/30 transition disabled:opacity-50"
+                            title="Refresh missing link preview images"
+                        >
+                            {refreshingPreviews ? '⏳ Refreshing...' : '🖼️ Refresh Previews'}
+                        </button>
                         <button
                             onClick={fetchLinks}
                             className="px-3 py-2 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition"
@@ -238,8 +295,15 @@ export default function AdminPanel() {
                         >
                             🚪 Logout
                         </button>
-                    </div>
+</div>
                 </div>
+
+                {/* Refresh Previews Result Toast */}
+                {previewResult && (
+                    <div className={`mb-4 p-4 rounded-lg ${previewResult.type === 'success' ? 'bg-green-500/20 border border-green-500/50' : 'bg-red-500/20 border border-red-500/50'}`}>
+                        <p className="text-sm">{previewResult.message}</p>
+                    </div>
+                )}
 
                 {/* Stats */}
                 <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-4 mb-6">
