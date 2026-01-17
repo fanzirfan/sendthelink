@@ -2,28 +2,95 @@
 import { NextResponse } from 'next/server';
 import * as cheerio from 'cheerio';
 
-// SSRF protection: restrict outgoing requests to a controlled set of domains.
-// Adjust these lists according to the domains you actually want to support.
-const ALLOWED_HOSTNAMES = [
-    // Exact hostnames explicitly allowed for link previews.
-    // Example: your own app domains or other trusted services.
-    'sendthelink.vercel.app',
-    'www.sendthelink.vercel.app',
-];
-const ALLOWED_DOMAIN_SUFFIXES = [
-    // Public suffixes you consider safe to allow, e.g. '.example.com'
-    // This allows any subdomain of the listed suffixes.
-    '.sendthelink.vercel.app',
+// SSRF Protection: Block internal/private network access
+// This uses a blocklist approach - allow all public internet, block internal networks
+const BLOCKED_HOSTNAMES = [
+    'localhost',
+    'localhost.localdomain',
+    'local',
+    '127.0.0.1',
+    '0.0.0.0',
+    '::1',
+    '[::]',
+    '[::1]',
 ];
 
-function isHostnameAllowed(hostname) {
-    if (ALLOWED_HOSTNAMES.length > 0 && ALLOWED_HOSTNAMES.includes(hostname)) {
+const BLOCKED_DOMAIN_SUFFIXES = [
+    '.local',
+    '.localhost',
+    '.localdomain',
+    '.internal',
+    '.intranet',
+    '.corp',
+    '.home',
+    '.lan',
+    '.private',
+];
+
+// Private IP ranges (RFC 1918, RFC 4193, RFC 6598, loopback, link-local)
+function isPrivateIP(hostname) {
+    // IPv4 patterns
+    const ipv4Patterns = [
+        /^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/,           // Loopback 127.0.0.0/8
+        /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/,            // Class A private 10.0.0.0/8
+        /^172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}$/, // Class B private 172.16.0.0/12
+        /^192\.168\.\d{1,3}\.\d{1,3}$/,              // Class C private 192.168.0.0/16
+        /^169\.254\.\d{1,3}\.\d{1,3}$/,              // Link-local 169.254.0.0/16
+        /^100\.(6[4-9]|[7-9]\d|1[0-1]\d|12[0-7])\.\d{1,3}\.\d{1,3}$/, // CGN 100.64.0.0/10
+        /^0\.0\.0\.0$/,                              // Default route
+        /^255\.255\.255\.255$/,                      // Broadcast
+    ];
+    
+    // Check if it's an IPv4 address
+    if (/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname)) {
+        return ipv4Patterns.some(pattern => pattern.test(hostname));
+    }
+    
+    // IPv6 patterns - block loopback and private
+    if (hostname.includes(':') || hostname.startsWith('[')) {
+        const cleanIPv6 = hostname.replace(/^\[|\]$/g, '');
+        // Loopback ::1
+        if (cleanIPv6 === '::1' || cleanIPv6 === '0:0:0:0:0:0:0:1') return true;
+        // Unspecified ::
+        if (cleanIPv6 === '::' || cleanIPv6 === '0:0:0:0:0:0:0:0') return true;
+        // Link-local fe80::/10
+        if (/^fe[89ab]/i.test(cleanIPv6)) return true;
+        // Unique local fc00::/7
+        if (/^f[cd]/i.test(cleanIPv6)) return true;
+    }
+    
+    return false;
+}
+
+function isHostnameBlocked(hostname) {
+    const lowerHostname = hostname.toLowerCase();
+    
+    // Check explicit blocked hostnames
+    if (BLOCKED_HOSTNAMES.includes(lowerHostname)) {
         return true;
     }
-    if (ALLOWED_DOMAIN_SUFFIXES.length > 0) {
-        return ALLOWED_DOMAIN_SUFFIXES.some((suffix) => hostname.endsWith(suffix));
+    
+    // Check blocked domain suffixes
+    if (BLOCKED_DOMAIN_SUFFIXES.some(suffix => lowerHostname.endsWith(suffix))) {
+        return true;
     }
-    // If no allow-list entries are configured, deny by default.
+    
+    // Check if it's a private/internal IP address
+    if (isPrivateIP(hostname)) {
+        return true;
+    }
+    
+    // Check for cloud metadata endpoints (AWS, GCP, Azure, DigitalOcean, etc.)
+    const metadataEndpoints = [
+        '169.254.169.254',     // AWS/GCP/Azure metadata
+        'metadata.google.internal',
+        'metadata.goog',
+        '169.254.170.2',       // AWS ECS task metadata
+    ];
+    if (metadataEndpoints.includes(lowerHostname)) {
+        return true;
+    }
+    
     return false;
 }
 
@@ -42,20 +109,22 @@ export async function POST(request) {
             return NextResponse.json({ error: 'Invalid URL format' }, { status: 400 });
         }
 
-        // SSRF Protection: Strict Domain Validation
-        // We reject any URL that looks like an IP address (IPv4 or IPv6) or local domain
+        // SSRF Protection: Block internal/private network access
         const hostname = validUrl.hostname;
 
-        const isIpAddress = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname) || hostname.startsWith('[') || hostname.includes(':');
-        const isLocal = hostname === 'localhost' || hostname.endsWith('.local') || hostname.endsWith('.internal');
-
-        if (isIpAddress || isLocal) {
-            return NextResponse.json({ error: 'Direct IP access and local domains are not allowed. Please use a valid public domain.' }, { status: 403 });
+        if (isHostnameBlocked(hostname)) {
+            return NextResponse.json({ 
+                error: 'Access to internal/private networks is not allowed.' 
+            }, { status: 403 });
         }
 
-        // Enforce allow-list: only fetch from explicitly permitted hostnames/domains
-        if (!isHostnameAllowed(hostname)) {
-            return NextResponse.json({ error: 'Preview for this domain is not allowed.' }, { status: 403 });
+        // Block requests to non-standard ports commonly used for internal services
+        const port = validUrl.port;
+        const blockedPorts = ['22', '23', '25', '3306', '5432', '6379', '27017', '9200', '11211'];
+        if (port && blockedPorts.includes(port)) {
+            return NextResponse.json({ 
+                error: 'Access to this port is not allowed.' 
+            }, { status: 403 });
         }
 
         // Special handling for X.com/Twitter (they block scraping)
