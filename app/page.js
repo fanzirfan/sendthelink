@@ -680,6 +680,17 @@ export default function Home() {
             >
               📧 DMCA Takedown Request
             </a>
+            <span className="mx-4" style={{ color: 'var(--text-muted)' }}>•</span>
+            <a
+              href="https://sociabuzz.com/fanzirfan/donate"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors"
+              style={{ color: 'var(--text-secondary)' }}
+              title="Support the developer"
+            >
+              ❤️ Donate
+            </a>
           </p>
         </footer>
 

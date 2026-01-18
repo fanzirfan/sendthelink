@@ -218,6 +218,66 @@ body {
   line-height: 24px;
 }
 
+/* Floating Donate Button */
+.donate-button {
+  position: fixed !important;
+  bottom: 24px !important;
+  left: 24px !important;
+  top: auto !important;
+  right: auto !important;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 12px 20px;
+  border-radius: var(--radius-lg);
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  z-index: 9999;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 4px 16px oklch(0.627 0.265 303.9 / 40%);
+  transition: all 0.2s ease;
+  will-change: transform, box-shadow;
+}
+
+.donate-button:hover {
+  background: oklch(0.55 0.265 303.9);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px oklch(0.627 0.265 303.9 / 50%);
+  text-decoration: none;
+}
+
+.donate-button:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px oklch(0.627 0.265 303.9 / 40%);
+}
+
+.donate-button__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: heart-pulse 2s ease-in-out infinite;
+}
+
+.donate-button__text {
+  display: inline;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+}
+
+@keyframes heart-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+}
+
 /* Tag Chip - Form Selector */
 .tag-chip {
   padding: 6px 14px;

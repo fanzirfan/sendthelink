@@ -93,7 +93,7 @@ export default function AnalyticsPolicy() {
 
                     <div className="pt-8 mt-8 border-t border-[var(--border)]">
                         <p className="text-sm text-[var(--muted-foreground)]">
-                            If you have any questions about this policy, please contact us at <a href="mailto:fanzirfan@proton.me" className="text-[var(--primary)] hover:underline">fanzirfan@proton.me</a>.
+                            If you have any questions about this policy, please contact us at <a href="mailto:dmca@manji.eu.org" className="text-[var(--primary)] hover:underline">dmca@manji.eu.org</a>.
                         </p>
                     </div>
 
