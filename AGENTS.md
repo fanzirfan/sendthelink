@@ -1,416 +1,144 @@
-# 🤖 AGENTS.md
-
-> This document describes the autonomous agents and AI services powering **SendTheLink**'s security and moderation systems.
-
-**Last Updated:** January 2026
-
----
-
-## 📋 Overview
-
-SendTheLink uses a multi-layer agent architecture to ensure link safety and content quality. These agents work together to:
-
-1. **Detect malicious URLs** before they reach users
-2. **Moderate content** to prevent spam, adult content, and scams
-3. **Verify user trust** through a badge system
-4. **Provide real-time security analysis** for all submitted links
-
----
-
-## 🔒 Security Agents
-
-### 1. VirusTotal Agent
-
-**Role:** Multi-antivirus engine scanner
-
-**Description:** Scans URLs against 70+ antivirus engines simultaneously to detect known malware, phishing, and malicious sites.
-
-**Implementation:** `/lib/urlScanner.js`
-
-**Key Features:**
-- Queries VirusTotal API v3
-- Returns malicious score (0-100)
-- Categorizes threats (malware, phishing, trojan, etc.)
-- Async processing for fast response
-
-**Configuration:**
-```bash
-VIRUSTOTAL_API_KEY=your_api_key
-```
-
-**Response Format:**
-```javascript
-{
-  malicious: boolean,
-  score: number,
-  engineCount: number,
-  maliciousEngines: string[],
-  lastAnalysis: timestamp
-}
-```
-
-**Limitations:**
-- Free tier: 500 requests/day
-- Rate limiting: 4 requests/minute
-- Latency: 1-3 seconds per scan
-
----
-
-### 2. URLScan.io Agent
-
-**Role:** Real-time URL behavioral analysis
-
-**Description:** Performs live browser-based scanning to analyze URL behavior, server responses, and page content.
-
-**Implementation:** `/lib/urlScanner.js`, `/app/api/scan/route.js`
-
-**Key Features:**
-- Live rendering and DOM analysis
-- Screenshot capture
-- Request/response tracking
-- Country-based server selection
-- Categorization (phishing, malware, parked, etc.)
-
-**Configuration:**
-```bash
-URLSCAN_API_KEY=your_api_key
-```
-
-**Scan Options:**
-```javascript
-{
-  url: string,
-  visibility: "public" | "unlisted" | "private",
-  tags: string[],
-  customagent: string  // Custom User-Agent header
-}
-```
-
-**Response Format:**
-```javascript
-{
-  uuid: string,
-  result: string,  // URL to fetch full results
-  api: string,
-  visibility: string,
-  status: number
-}
-```
-
-**Visibility Levels:**
-
-| Level | Description |
-|-------|-------------|
-| Public | Visible on urlscan.io frontpage and search |
-| Unlisted | Not public, visible to researchers |
-| Private | Only visible to submitter (recommended for user submissions) |
-
-**Rate Limits:**
-- Free tier: 200 requests/day
-- Rate limiting enforced via HTTP 429 headers
-- Poll results until HTTP 200 received
-
----
-
-### 3. Google Safe Browsing Agent
-
-**Role:** Malware and phishing blacklist
-
-**Description:** Checks URLs against Google's constantly updated threat intelligence database.
-
-**Implementation:** `/app/api/moderate/route.js`
-
-**Key Features:**
-- Real-time threat detection
-- Google Chrome/Google Safe Browsing integration
-- Phishing and malware protection
-- Social engineering detection
-
-**Configuration:**
-```bash
-SAFE_BROWSING_API_KEY=your_api_key
-```
-
-**Response Format:**
-```javascript
-{
-  safe: boolean,
-  threats: string[],
-  threatTypes: string[]
-}
-```
-
----
-
-## 🤖 AI Moderation Agent
-
-### 4. Gemini Content Moderation Agent
-
-**Role:** Intelligent content analysis
-
-**Description:** Uses Google's Gemini 2.0 Flash model to analyze URLs and messages for safety, categorization, and quality.
-
-**Implementation:** `/app/api/moderate/route.js`
-
-**Model:** `gemini-2.0-flash-exp`
-
-**Key Features:**
-- Natural language understanding
-- Content categorization
-- Safety classification
-- Context-aware analysis
-- Multi-language support
-
-**Prompt Template:**
-```
-Analyze URL: ${url}
-Message: ${message}
-
-Is it safe (YouTube, Google, news, tutorials, tools) or unsafe (porn, gambling, scam, malicious)?
-
-Respond in JSON format only:
-{
-  "safe": true/false,
-  "reason": "brief explanation",
-  "category": "Design | Code | Tools | Tutorial | AI | Other",
-  "confidence": 0.0-1.0
-}
-```
-
-**Response Format:**
-```javascript
-{
-  safe: boolean,
-  reason: string,
-  category: string,
-  confidence: number
-}
-```
-
-**Use Cases:**
-1. URL safety classification
-2. Spam detection
-3. Adult content filtering
-4. Scam and fraud detection
-5. Content categorization
-
-**Configuration:**
-```bash
-GEMINI_API_KEY=your_api_key
-```
-
-**Cost Considerations:**
-- Free tier available
-- Charged per 1,000 tokens
-- Optimized for fast responses (flash model)
-
----
-
-## 🛡️ Defense in Depth
-
-### Agent Execution Order
-
-The agents execute in a specific sequence to maximize efficiency and minimize false positives:
-
-```
-1. Regex Pattern Filter (Instant)
-   ↓
-2. Google Safe Browsing (Fast)
-   ↓
-3. Gemini AI Moderation (Smart)
-   ↓
-4. VirusTotal Scanner (Thorough)
-   ↓
-5. URLScan.io Analysis (Behavioral)
-```
-
-**Why This Order?**
-
-1. **Regex First** - Instant rejection of obvious spam (0ms)
-2. **Safe Browsing Second** - Quick threat check (100-500ms)
-3. **Gemini Third** - Smart classification before expensive scans (1-2s)
-4. **VirusTotal Fourth** - Known threat detection (1-3s)
-5. **URLScan.io Last** - Deep behavioral analysis (10-30s, async)
-
-### Decision Matrix
-
-| Agent | Safe | Suspicious | Malicious |
-|-------|------|------------|-----------|
-| Regex Pattern | ✅ Pass | ⚠️ Flag | 🚫 Block |
-| Safe Browsing | ✅ Pass | ⚠️ Flag | 🚫 Block |
-| Gemini AI | ✅ Pass | ⚠️ Review | 🚫 Block |
-| VirusTotal | ✅ Score > 50 | ⚠️ Score 20-50 | 🚫 Score < 20 |
-| URLScan.io | ✅ Pass | ⚠️ Review | 🚫 Block |
-
-**Final Security Status:**
-- **Safe ✅** - All agents pass
-- **Suspicious ⚠️** - One or more agents flag issues (requires admin review)
-- **Malicious 🚨** - Multiple agents block (auto-reject)
-- **Pending 🔄** - Scanning in progress (async agents)
-
----
-
-## 🔧 Configuration
-
-### Environment Variables
-
-```bash
-# Security APIs
-VIRUSTOTAL_API_KEY=
-URLSCAN_API_KEY=
-SAFE_BROWSING_API_KEY=
-GEMINI_API_KEY=
-
-# reCAPTCHA (Bot Protection)
-NEXT_PUBLIC_RECAPTCHA_SITE_KEY=
-RECAPTCHA_SECRET_KEY=
-RECAPTCHA_MIN_SCORE=0.5
-
-# Admin & Verification
-ADMIN_PASSWORD=
-VERIFIED_USER_PASSWORD=
-
-# Moderation
-FILTER_WHITELIST_MODE=false
-```
-
-### Customizing Agent Behavior
-
-#### Adjust VirusTotal Threshold
-
-File: `/lib/urlScanner.js`
-```javascript
-const VIRUSTOTAL_THRESHOLD = 50;  // Lower = stricter
-```
-
-#### Adjust Gemini Prompts
-
-File: `/app/api/moderate/route.js`
-```javascript
-const MODERATION_PROMPT = `Analyze URL: ${url}...`;
-```
-
-#### Adjust Regex Patterns
-
-File: `/app/api/moderate/route.js`
-```javascript
-const BLOCKED_PATTERNS = [
-  /\b(porn|xxx|adult)\b/i,
-  /\b(gambling|casino|bet)\b/i,
-  // Add custom patterns
-];
-```
-
----
-
-## 📊 Agent Performance
-
-### Average Response Times
-
-| Agent | Avg Time | 95th Percentile |
-|-------|----------|-----------------|
-| Regex Filter | <1ms | <5ms |
-| Safe Browsing | 200ms | 500ms |
-| Gemini AI | 1.5s | 3s |
-| VirusTotal | 2s | 4s |
-| URLScan.io (submit) | 1s | 2s |
-| URLScan.io (result) | 15s | 30s |
-
-### Accuracy Rates (Estimates)
-
-| Agent | True Positive | False Positive | True Negative | False Negative |
-|-------|---------------|----------------|----------------|-----------------|
-| Regex Filter | 95% | 20% | 80% | 5% |
-| Safe Browsing | 98% | 2% | 98% | 2% |
-| Gemini AI | 90% | 5% | 95% | 10% |
-| VirusTotal | 99% | 1% | 99% | 1% |
-| URLScan.io | 95% | 3% | 97% | 5% |
-
----
-
-## 🚨 Error Handling
-
-### Agent Failure Fallbacks
-
-1. **VirusTotal Down**
-   - Fallback to URLScan.io only
-   - Mark as "Pending" for manual review
-
-2. **Gemini Down**
-   - Fallback to regex + Safe Browsing
-   - Log error for monitoring
-
-3. **URLScan.io Down**
-   - Rely on VirusTotal + Gemini
-   - Continue without behavioral analysis
-
-4. **Safe Browsing Down**
-   - Continue with other agents
-   - Monitor for increased spam
-
-### Error Codes
-
-| Code | Description | Action |
-|------|-------------|--------|
-| `VT_RATE_LIMIT` | VirusTotal quota exceeded | Queue for retry |
-| `URLSCAN_UNAVAILABLE` | URLScan.io service down | Use fallback |
-| `GEMINI_TIMEOUT` | Gemini response timeout | Retry with shorter prompt |
-| `SB_API_ERROR` | Safe Browsing error | Continue without |
-
----
-
-## 🔮 Future Agent Enhancements
-
-### Planned Additions
-
-- [ ] **Phishing Detection Agent** - ML-based pattern recognition for phishing URLs
-- [ ] **Content Summarization Agent** - Auto-generate link descriptions
-- [ ] **Duplicate Detection Agent** - Identify and merge similar links
-- [ ] **User Reputation Agent** - Track user behavior patterns
-- [ ] **Image Moderation Agent** - Analyze screenshot content (if added)
-
-### Potential Integrations
-
-- OpenAI Content Moderation API
-- AWS Rekognition (for image moderation)
-- Cloudflare Security Center
-- Have I Been Pwned (breached credential checking)
-
----
-
-## 📚 API Documentation
-
-For detailed API documentation for each agent:
-
-- **VirusTotal:** https://docs.virustotal.com/reference
-- **URLScan.io:** See `URLscan Documentaion.md`
-- **Google Safe Browsing:** https://developers.google.com/safe-browsing
-- **Google Gemini:** https://ai.google.dev/gemini-api/docs
-
----
-
-## 🤝 Contributing
-
-To add new agents or modify existing ones:
-
-1. Create agent function in `/lib/` or `/app/api/`
-2. Follow the async pattern for long-running operations
-3. Add error handling with appropriate fallbacks
-4. Update this documentation with agent details
-5. Test with various URL types (safe, suspicious, malicious)
-
----
-
-## 📧 Support
-
-For issues related to specific agents:
-
-- **VirusTotal:** Check your API key and rate limits
-- **URLScan.io:** Verify UUID polling and visibility settings
-- **Gemini:** Ensure API key has billing enabled (even if free tier)
-- **General:** Open a GitHub issue with agent logs
-
----
-
-**Document Version:** 1.0
-**Maintained by:** FanzYB
+# AGENTS.md
+
+## Overview
+SendTheLink is a Next.js App Router project (Next 16, React 19) that stores links in Firebase and runs security scans. The codebase is JavaScript-first with API routes in `app/api` and shared utilities in `lib`.
+
+## Commands
+- Dev server: `npm run dev`
+- Production build: `npm run build`
+- Start production server: `npm run start`
+- Lint: `npm run lint`
+
+### Tests
+- No test runner is configured (no jest/vitest/playwright configs found).
+- Single-test command: not applicable until a test runner is added.
+- When adding tests, document `npm test` and the single-test invocation here.
+
+## Project Structure
+- `app/`: App Router pages, layouts, and route handlers
+- `app/api/`: Server-only API route handlers (moderate, scan, submit, admin, preview)
+- `lib/`: Shared utilities (firebase, scanning, sanitization, auth, rate limiting)
+- `public/`: Static assets
+
+## Runtime & Framework Notes
+- App Router uses React Server Components by default; keep client components isolated.
+- API routes that require Firebase or Node-only libraries should set:
+  - `export const runtime = 'nodejs';`
+  - `export const dynamic = 'force-dynamic';`
+- Prefer `NextResponse.json()` for all JSON responses.
+
+## Import Conventions
+- Use ES module imports.
+- Prefer named imports from Next and Firebase packages.
+- Path alias is configured in `jsconfig.json`: use `@/` for root imports when helpful.
+- Keep import order: built-ins, external packages, internal modules.
+- Avoid unused imports; keep imports close to actual usage.
+
+## Formatting & Style
+- JavaScript only (no TypeScript config present). Avoid adding TS unless requested.
+- Indentation: 4 spaces (match existing files).
+- Quotes: single quotes for strings; double quotes only when required.
+- Semicolons are used throughout; keep them consistent.
+- Prefer `const` by default; use `let` only when reassignment is needed.
+- Use `async/await` for asynchronous flows; avoid promise chaining in new code.
+- Keep helper functions small and focused; move shared logic into `lib/`.
+
+## Types & Documentation
+- Prefer JSDoc comments for exported helpers with non-obvious inputs/outputs.
+- Keep JSDoc concise; document object shapes only when they are reused.
+- Avoid introducing TypeScript types or interfaces unless explicitly requested.
+- Keep public APIs (exports, route responses) stable and well described.
+
+## Client/Server Boundaries
+- Treat `app/api` as server-only; avoid using browser APIs there.
+- In `app/` components, add `'use client'` only when interactivity is required.
+- Never import server-only utilities (Firebase admin, Node `crypto`, etc.) into client components.
+- Use `NEXT_PUBLIC_*` env vars only when values are safe for the browser.
+
+## Naming Conventions
+- App Router file names: `page.js`, `layout.js`, `route.js`.
+- Utility modules: lowerCamelCase filenames (`urlScanner.js`, `rateLimit.js`).
+- Functions: concise, verb-driven names that match intent (`checkURLSecurity`).
+- Constants: `UPPER_SNAKE_CASE` for shared constants, `lowerCamelCase` for locals.
+
+## API Route Conventions
+- Export `async function POST(request)` or `GET` as needed.
+- Validate inputs early; return 4xx for client errors.
+- Read JSON via `await request.json()`; use `request.clone()` if you need to re-read.
+- Avoid mixing business logic in routes; offload shared logic to `lib/`.
+- Use `NextResponse.json()` with explicit status codes and minimal payloads.
+- Avoid exposing secrets, stack traces, or internal details in production responses.
+
+## API Response Patterns
+- Success responses use `{ success: true, ... }` or a minimal payload when possible.
+- Error responses include an `error` message; add `details` only in development.
+- Prefer consistent field names across endpoints (e.g., `securityStatus`, `linkId`).
+- Keep payloads small; do not return full Firestore documents unless necessary.
+
+## Error Handling & Logging
+- Wrap API handlers in `try/catch` and return a safe response payload.
+- Log errors with `console.error` and a clear, searchable prefix.
+- Avoid empty catches; return a fallback response or rethrow.
+- In production responses, hide sensitive details; use env-gated details only in dev.
+
+## Security & Validation Patterns
+- Always validate URL inputs and enforce `http`/`https`.
+- Use SSRF protections when fetching remote URLs (see `app/api/preview/route.js`).
+- Sanitize and truncate user input before storing in Firestore.
+- Maintain moderation flow order: regex filter -> Safe Browsing -> Gemini.
+- Treat external fetches as untrusted; set timeouts and user agents.
+
+## Moderation & Scanning Flow
+- Submissions default to `securityStatus: 'pending'` and `status: 'approved'`.
+- Background scans run via `app/api/scan/route.js` and update Firestore.
+- If scans mark `malicious` or `suspicious`, set status to `pending_review`.
+- Keep scan metadata under `securityScan` and include timestamps.
+
+## Firebase Usage
+- Firestore access is in `lib/firebase.js` and used in API routes.
+- Prefer server-only access for writes; keep client exposure minimal.
+- Use collection names consistently (`shared_links`).
+- Avoid initializing Firebase multiple times; reuse `getApps()` guard.
+
+## Data Model Notes
+- `shared_links` documents typically include `from`, `message`, `url`, `tags`.
+- Metadata fields include `metaTitle`, `metaImage`, `createdAt`, `reportCount`.
+- Status fields include `status`, `securityStatus`, and `securityScan`.
+- When adding fields, update admin views and any derived totals accordingly.
+
+## Auth & Rate Limiting
+- Admin auth tokens are generated in `lib/adminAuth.js` using HMAC signatures.
+- Passwords come from env vars; use local defaults only for dev.
+- Rate limiting is in-memory (`lib/rateLimit.js`); keep limits conservative.
+- Return `retryAfter` for rate-limit rejections to aid clients.
+
+## Environment Variables
+- `NEXT_PUBLIC_FIREBASE_*` for Firebase client config.
+- `ADMIN_PASSWORD` for admin auth token generation.
+- `VERIFIED_USER_PASSWORD` for verified user flows.
+- `VIRUSTOTAL_API_KEY` and `URLSCAN_API_KEY` for security scanning.
+- `NEXT_PUBLIC_SITE_URL` or `VERCEL_URL` for base URL in API callbacks.
+- Never commit secrets or real credentials to source control.
+
+## Linting Rules
+- ESLint config extends `next/core-web-vitals` via `eslint-config-next`.
+- Run `npm run lint` before finalizing changes when feasible.
+- Do not introduce new lint tooling unless requested.
+
+## Frontend & UI Notes
+- Use functional components and React hooks in `app/`.
+- Prefer server components unless client-side interactivity is required.
+- Keep UI logic slim; move heavy logic to `lib/` or server routes.
+- Align with existing Tailwind conventions if adjusting styles.
+
+## Files & Assets
+- Keep static assets in `public/`.
+- Prefer storing shared constants in `lib/` to avoid duplication.
+
+## Cursor/Copilot Rules
+- No `.cursor/rules`, `.cursorrules`, or `.github/copilot-instructions.md` found.
+
+## Notes for Agents
+- Keep changes minimal and aligned with existing patterns.
+- Avoid refactors while fixing bugs unless explicitly requested.
+- No tests available; rely on lint/build for verification when requested.

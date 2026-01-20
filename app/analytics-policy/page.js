@@ -3,6 +3,8 @@ export const metadata = {
     description: "Learn about how SendTheLink uses Vercel Analytics to improve user experience while respecting your privacy.",
 };
 
+import Link from "next/link";
+
 export default function AnalyticsPolicy() {
     return (
         <div className="min-h-screen py-10 px-4 flex justify-center">
@@ -10,7 +12,7 @@ export default function AnalyticsPolicy() {
 
                 {/* Header */}
                 <div className="mb-8 border-b border-[var(--border)] pb-6">
-                    <a
+                    <Link
                         href="/"
                         className="inline-flex items-center text-sm mb-4 text-[var(--muted-foreground)] hover:text-[var(--primary)] transition-colors"
                     >
@@ -19,7 +21,7 @@ export default function AnalyticsPolicy() {
                             <path d="M12 19l-7-7 7-7" />
                         </svg>
                         Back to Home
-                    </a>
+                    </Link>
                     <h1 className="text-3xl font-bold mb-2">Analytics Policy</h1>
                     <p className="text-[var(--muted-foreground)]">Effective Date: January 10, 2026</p>
                 </div>
@@ -87,7 +89,7 @@ export default function AnalyticsPolicy() {
                     <section>
                         <h2 className="text-xl font-semibold mb-3 text-[var(--foreground)]">Opt-Out</h2>
                         <p className="leading-relaxed">
-                            Since Vercel Analytics does not track individuals or use cookies for tracking, typical "Do Not Track" signals are respected where applicable by the platform standard, but there is no specific opt-out button needed as no personal data is at risk.
+                            Since Vercel Analytics does not track individuals or use cookies for tracking, typical &quot;Do Not Track&quot; signals are respected where applicable by the platform standard, but there is no specific opt-out button needed as no personal data is at risk.
                         </p>
                     </section>
 

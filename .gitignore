@@ -31,7 +31,9 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*
+.env
+.env.vercel
+.env.local
 
 # vercel
 .vercel
@@ -40,4 +42,3 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel

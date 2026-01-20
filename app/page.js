@@ -30,7 +30,6 @@ const AVAILABLE_TAGS = [
 
 export default function Home() {
   const [links, setLinks] = useState([]);
-  const [filteredLinks, setFilteredLinks] = useState([]);
   const [form, setForm] = useState({ from: "", message: "", url: "", isAnonymous: false, tags: [], verifyPassword: "" });
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -77,13 +76,12 @@ export default function Home() {
         !link.status || link.status === 'approved'
       );
       setLinks(approvedLinks);
-      setFilteredLinks(approvedLinks);
     });
     return () => unsubscribe();
   }, []);
 
   // Search and tag filter
-  useEffect(() => {
+  const filteredLinks = useMemo(() => {
     let filtered = links;
 
     // Filter by tag first
@@ -104,7 +102,7 @@ export default function Home() {
       );
     }
 
-    setFilteredLinks(filtered);
+    return filtered;
   }, [searchQuery, links, activeTagFilter]);
 
   // Get reCAPTCHA token
@@ -335,7 +333,7 @@ export default function Home() {
             <div className="glass-card p-6 max-w-md w-full">
               <h3 className="text-xl font-bold mb-4">🚩 Report Inappropriate Content</h3>
               <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                Please tell us why you're reporting this link:
+                Please tell us why you&apos;re reporting this link:
               </p>
               <textarea
                 value={reportReason}
@@ -502,7 +500,7 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {filteredLinks.length === 0 && searchQuery && (
             <div className="col-span-full text-center py-12" style={{ color: 'var(--text-muted)' }}>
-              <p className="text-xl">No links found matching "{searchQuery}"</p>
+              <p className="text-xl">No links found matching &quot;{searchQuery}&quot;</p>
             </div>
           )}
 
@@ -581,7 +579,7 @@ export default function Home() {
 
               {/* Message */}
               <p className="text-base mb-4 leading-relaxed" style={{ color: 'var(--text-primary)' }}>
-                "{item.message}"
+                &quot;{item.message}&quot;
               </p>
 
               {/* Link Preview Card */}
@@ -623,7 +621,7 @@ export default function Home() {
 
               {/* View Details Hint */}
               <div className="mt-3 text-xs text-center" style={{ color: 'var(--text-muted)' }}>
-                👆 Click card "View Details"
+                👆 Click card &quot;View Details&quot;
               </div>
 
             </Link>
