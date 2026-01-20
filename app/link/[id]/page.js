@@ -76,6 +76,26 @@ export default function LinkDetailsPage() {
         }
     }, [params.id]);
 
+    // Track view count
+    useEffect(() => {
+        const trackView = async () => {
+            if (params.id) {
+                try {
+                    await fetch('/api/track-view', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ linkId: params.id }),
+                    });
+                } catch (err) {
+                    // Ignore tracking errors on client
+                    console.error('Tracking error:', err);
+                }
+            }
+        };
+
+        trackView();
+    }, [params.id]);
+
     // Handle copy link button
     const handleCopyLink = (url) => {
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -228,7 +248,7 @@ export default function LinkDetailsPage() {
                         <div className="glass-card p-6 max-w-md w-full">
                             <h3 className="text-xl font-bold mb-4">🚩 Report Inappropriate Content</h3>
                             <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                                Please tell us why you're reporting this link:
+                                Please tell us why you&apos;re reporting this link:
                             </p>
                             <textarea
                                 value={reportReason}
@@ -333,7 +353,7 @@ export default function LinkDetailsPage() {
                             📝 Message
                         </h2>
                         <p className="text-lg leading-relaxed" style={{ color: 'var(--text-primary)' }}>
-                            "{linkData.message}"
+                            &quot;{linkData.message}&quot;
                         </p>
                     </div>
 
