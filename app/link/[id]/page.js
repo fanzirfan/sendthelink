@@ -1,6 +1,6 @@
 // app/link/[id]/page.js
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import Link from "next/link";
@@ -35,6 +35,7 @@ export default function LinkDetailsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [toast, setToast] = useState(null);
+    const lastViewedId = useRef(null);
 
     // Report modal state
     const [reportModal, setReportModal] = useState(false);
@@ -79,7 +80,8 @@ export default function LinkDetailsPage() {
     // Track view count
     useEffect(() => {
         const trackView = async () => {
-            if (params.id) {
+            if (params.id && lastViewedId.current !== params.id) {
+                lastViewedId.current = params.id;
                 try {
                     await fetch('/api/track-view', {
                         method: 'POST',
