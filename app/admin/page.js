@@ -1,6 +1,6 @@
 // app/admin/page.js
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 // Available tags for categorization (must match page.js)
@@ -24,7 +24,6 @@ export default function AdminPanel() {
     const [authenticated, setAuthenticated] = useState(false);
     const [password, setPassword] = useState("");
     const [links, setLinks] = useState([]);
-    const [filteredLinks, setFilteredLinks] = useState([]);
     const [filter, setFilter] = useState("all"); // all, reported, flagged, security, verified, notverified
     const [searchQuery, setSearchQuery] = useState("");
     const [loading, setLoading] = useState(false);
@@ -36,17 +35,52 @@ const [deleteConfirm, setDeleteConfirm] = useState(null); // For custom delete m
     const [refreshingPreviews, setRefreshingPreviews] = useState(false); // For refresh previews
     const [previewResult, setPreviewResult] = useState(null); // For showing refresh result
 
+    const fetchLinks = async () => {
+        setLoading(true);
+        try {
+            const authToken = localStorage.getItem('adminToken');
+            const res = await fetch('/api/admin/links', {
+                headers: { 'Authorization': `Bearer ${authToken}` }
+            });
+
+            if (res.status === 401) {
+                localStorage.removeItem('adminToken');
+                setAuthenticated(false);
+                return;
+            }
+
+            const data = await res.json();
+            setLinks(data.links || []);
+        } catch (error) {
+            console.error('Failed to fetch links:', error);
+        }
+        setLoading(false);
+    };
+
+
+
     // Check for existing auth in localStorage
     useEffect(() => {
         const token = localStorage.getItem('adminToken');
         if (token) {
+            // eslint-disable-next-line
             setAuthenticated(true);
-            fetchLinks();
+            // fetchLinks(); // Can't call this here directly if it depends on state/props not yet initialized or causes lint issues
+            // Instead, we will rely on a separate useEffect or call it after render if authenticated is true.
+            // But fetchLinks depends on 'authenticated' state indirectly via localStorage check?
         }
     }, []);
 
-    // Filter links based on selected filter and search
+    // Fetch links when authenticated changes to true
     useEffect(() => {
+        if (authenticated) {
+            // eslint-disable-next-line
+            fetchLinks();
+        }
+    }, [authenticated]);
+
+    // Filter links based on selected filter and search
+    const filteredLinks = useMemo(() => {
         let filtered = links;
 
         // Apply filter
@@ -64,6 +98,8 @@ const [deleteConfirm, setDeleteConfirm] = useState(null); // For custom delete m
             filtered = filtered.filter(link => link.isVerified === true);
         } else if (filter === "notverified") {
             filtered = filtered.filter(link => !link.isVerified);
+        } else if (filter === "mostviewed") {
+            filtered = [...filtered].sort((a, b) => (b.views || 0) - (a.views || 0));
         }
 
         // Apply search
@@ -76,7 +112,7 @@ const [deleteConfirm, setDeleteConfirm] = useState(null); // For custom delete m
             );
         }
 
-        setFilteredLinks(filtered);
+        return filtered;
     }, [links, filter, searchQuery]);
 
     const handleLogin = async (e) => {
@@ -108,27 +144,7 @@ const [deleteConfirm, setDeleteConfirm] = useState(null); // For custom delete m
         setLoading(false);
     };
 
-    const fetchLinks = async () => {
-        setLoading(true);
-        try {
-            const authToken = localStorage.getItem('adminToken');
-            const res = await fetch('/api/admin/links', {
-                headers: { 'Authorization': `Bearer ${authToken}` }
-            });
 
-            if (res.status === 401) {
-                localStorage.removeItem('adminToken');
-                setAuthenticated(false);
-                return;
-            }
-
-            const data = await res.json();
-            setLinks(data.links || []);
-        } catch (error) {
-            console.error('Failed to fetch links:', error);
-        }
-        setLoading(false);
-    };
 
     const handleDelete = async (linkId) => {
         try {
@@ -384,6 +400,13 @@ const handleLogout = () => {
                             >
                                 ✗
                             </button>
+                            <button
+                                onClick={() => setFilter("mostviewed")}
+                                className={`px-3 py-1.5 text-sm rounded-lg transition ${filter === "mostviewed" ? "bg-pink-500" : "bg-white/10 hover:bg-white/20"
+                                    }`}
+                            >
+                                👁️ Most Viewed
+                            </button>
                         </div>
 
                         {/* Search */}
@@ -635,6 +658,9 @@ const handleLogout = () => {
                                             {(link.reportCount || 0) > 0 && (
                                                 <span className="text-xs text-yellow-300">⚠️ {link.reportCount} reports</span>
                                             )}
+                                            <div className="text-xs text-blue-200 bg-blue-500/10 px-2 py-0.5 rounded">
+                                                👁️ {link.views || 0} views
+                                            </div>
                                         </div>
 
                                         {/* Actions */}
@@ -678,6 +704,7 @@ const handleLogout = () => {
                                             <th className="text-left p-3">Message</th>
                                             <th className="text-left p-3">Tags</th>
                                             <th className="text-left p-3">URL</th>
+                                            <th className="text-left p-3">Views</th>
                                             <th className="text-left p-3">Reports</th>
                                             <th className="text-left p-3">Security</th>
                                             <th className="text-left p-3">Status</th>
@@ -724,6 +751,11 @@ const handleLogout = () => {
                                                     >
                                                         {(() => { try { return new URL(link.url).hostname; } catch { return link.url; } })()}
                                                     </a>
+                                                </td>
+                                                <td className="p-3 text-sm">
+                                                    <div className="flex items-center gap-1">
+                                                        👁️ {link.views || 0}
+                                                    </div>
                                                 </td>
                                                 <td className="p-3 text-sm">
                                                     <span className={`${(link.reportCount || 0) > 0 ? 'text-yellow-300 font-bold' : ''}`}>
