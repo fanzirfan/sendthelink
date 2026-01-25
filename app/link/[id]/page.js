@@ -5,6 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../lib/firebase";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { ArrowLeft, Copy, Link as LinkIcon, Flag, LoaderCircle, Frown, Clock, CheckCircle, FileText, Gamepad2, Palette, Laptop, BookOpen, Hammer, Bot, Music, Film, PenTool, Smartphone, Monitor, Box, ExternalLink } from "lucide-react";
 
 // Helper function to validate image URLs
 const isValidImageUrl = (url) => {
@@ -14,19 +15,19 @@ const isValidImageUrl = (url) => {
 
 // Available tags for categorization
 const AVAILABLE_TAGS = [
-    { id: '3d', label: '3D Assets', emoji: '🎮' },
-    { id: 'design', label: 'Design', emoji: '🎨' },
-    { id: 'code', label: 'Code', emoji: '💻' },
-    { id: 'tutorial', label: 'Tutorial', emoji: '📚' },
-    { id: 'tools', label: 'Tools', emoji: '🛠️' },
-    { id: 'ai', label: 'AI', emoji: '🤖' },
-    { id: 'music', label: 'Music', emoji: '🎵' },
-    { id: 'video', label: 'Video', emoji: '🎬' },
-    { id: 'fonts', label: 'Fonts', emoji: '✍️' },
-    { id: 'game', label: 'Game', emoji: '🕹️' },
-    { id: 'android', label: 'Android', emoji: '🤖' },
-    { id: 'windows', label: 'Windows', emoji: '🪟' },
-    { id: 'other', label: 'Other', emoji: '📦' },
+    { id: '3d', label: '3D Assets', icon: Gamepad2 },
+    { id: 'design', label: 'Design', icon: Palette },
+    { id: 'code', label: 'Code', icon: Laptop },
+    { id: 'tutorial', label: 'Tutorial', icon: BookOpen },
+    { id: 'tools', label: 'Tools', icon: Hammer },
+    { id: 'ai', label: 'AI', icon: Bot },
+    { id: 'music', label: 'Music', icon: Music },
+    { id: 'video', label: 'Video', icon: Film },
+    { id: 'fonts', label: 'Fonts', icon: PenTool },
+    { id: 'game', label: 'Game', icon: Gamepad2 },
+    { id: 'android', label: 'Android', icon: Smartphone },
+    { id: 'windows', label: 'Windows', icon: Monitor },
+    { id: 'other', label: 'Other', icon: Box },
 ];
 
 export default function LinkDetailsPage() {
@@ -103,7 +104,7 @@ export default function LinkDetailsPage() {
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(url)
                 .then(() => {
-                    showToast(`📋 Link copied!`, "success");
+                    showToast("Link copied!", "success");
                 })
                 .catch((err) => {
                     console.error('Clipboard error:', err);
@@ -141,7 +142,7 @@ export default function LinkDetailsPage() {
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text)
                 .then(() => {
-                    showToast(`🔗 Page link copied!`, "success");
+                    showToast("Page link copied!", "success");
                 })
                 .catch(() => {
                     showToast(text, "info");
@@ -154,7 +155,7 @@ export default function LinkDetailsPage() {
     // Submit report
     const submitReport = async () => {
         if (!reportReason.trim()) {
-            showToast("ℹ️ Please enter a reason for reporting", "warning");
+            showToast("Please enter a reason for reporting", "warning");
             return;
         }
 
@@ -175,15 +176,15 @@ export default function LinkDetailsPage() {
             const data = await res.json();
 
             if (data.alreadyReported) {
-                showToast("⚠️ You've already reported this link", "warning");
+                showToast("You've already reported this link", "warning");
             } else if (data.success) {
-                showToast(`✅ Report submitted! (Total: ${data.reportCount})`, "success");
+                showToast(`Report submitted! (Total: ${data.reportCount})`, "success");
             } else {
-                showToast("❌ Failed to submit report", "error");
+                showToast("Failed to submit report", "error");
             }
         } catch (error) {
             console.error('Report error:', error);
-            showToast("❌ Network error. Please try again.", "error");
+            showToast("Network error. Please try again.", "error");
         }
 
         setReportModal(false);
@@ -207,7 +208,9 @@ export default function LinkDetailsPage() {
         return (
             <main className="min-h-screen px-4 md:px-10 py-8 md:py-10 flex items-center justify-center">
                 <div className="glass-card p-8 text-center">
-                    <div className="text-4xl mb-4 animate-pulse">⏳</div>
+                    <div className="text-4xl mb-4 text-[var(--foreground)]">
+                        <LoaderCircle className="inline animate-spin" size={36} />
+                    </div>
                     <p className="text-lg">Loading link details...</p>
                 </div>
             </main>
@@ -218,11 +221,13 @@ export default function LinkDetailsPage() {
         return (
             <main className="min-h-screen px-4 md:px-10 py-8 md:py-10 flex items-center justify-center">
                 <div className="glass-card p-8 text-center max-w-md">
-                    <div className="text-5xl mb-4">😕</div>
+                    <div className="text-5xl mb-4 text-[var(--foreground)]">
+                        <Frown size={48} className="inline" />
+                    </div>
                     <h1 className="text-2xl font-bold mb-4">Oops!</h1>
                     <p className="text-lg mb-6" style={{ color: 'var(--text-secondary)' }}>{error}</p>
                     <Link href="/" className="btn-glass inline-block">
-                        ← Back to Home
+                        <ArrowLeft size={16} className="inline mr-2" /> Back to Home
                     </Link>
                 </div>
             </main>
@@ -248,7 +253,9 @@ export default function LinkDetailsPage() {
                 {reportModal && (
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
                         <div className="glass-card p-6 max-w-md w-full">
-                            <h3 className="text-xl font-bold mb-4">🚩 Report Inappropriate Content</h3>
+                            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <Flag size={20} className="text-red-500" /> Report Inappropriate Content
+                            </h3>
                             <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                                 Please tell us why you&apos;re reporting this link:
                             </p>
@@ -283,7 +290,7 @@ export default function LinkDetailsPage() {
                     href="/"
                     className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition font-semibold fade-in-up"
                 >
-                    ← Back to Home
+                    <ArrowLeft size={16} /> Back to Home
                 </Link>
 
                 {/* Main Content Card */}
@@ -296,11 +303,11 @@ export default function LinkDetailsPage() {
                                 Shared by
                             </div>
                             <div className="flex items-center gap-3">
-                                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
+                                <h1 className="text-2xl md:text-3xl font-bold text-[var(--foreground)]">
                                     {linkData.from || "Anonymous"}
                                 </h1>
                                 {linkData.isVerified && (
-                                    <span className="verified-badge">✓ Verified</span>
+                                    <span className="verified-badge"><CheckCircle size={12} className="inline mr-1" /> Verified</span>
                                 )}
                             </div>
                         </div>
@@ -311,28 +318,28 @@ export default function LinkDetailsPage() {
                                 className="text-base px-4 py-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 transition font-bold"
                                 title="Share this page"
                             >
-                                🔗 Share
+                                <LinkIcon size={16} className="inline mr-2" /> Share
                             </button>
                             <button
                                 onClick={() => handleCopyLink(linkData.url)}
                                 className="text-base px-4 py-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 transition font-bold"
                                 title="Copy original link to clipboard"
                             >
-                                📋 Copy Link
+                                <Copy size={16} className="inline mr-2" /> Copy Link
                             </button>
                             <button
                                 onClick={() => setReportModal(true)}
                                 className="text-base px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition font-bold"
                                 title="Report inappropriate content"
                             >
-                                🚩 Report
+                                <Flag size={16} className="inline mr-2" /> Report
                             </button>
                         </div>
                     </div>
 
                     {/* Date */}
                     <div className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
-                        🕐 {formatDate(linkData.createdAt)}
+                        <Clock size={14} className="inline mr-2" /> {formatDate(linkData.createdAt)}
                     </div>
 
                     {/* Tags */}
@@ -342,7 +349,7 @@ export default function LinkDetailsPage() {
                                 const tag = AVAILABLE_TAGS.find(t => t.id === tagId);
                                 return tag ? (
                                     <span key={tagId} className="tag-display text-sm px-3 py-1">
-                                        {tag.emoji} {tag.label}
+                                        <tag.icon size={14} className="inline mr-1" /> {tag.label}
                                     </span>
                                 ) : null;
                             })}
@@ -352,7 +359,7 @@ export default function LinkDetailsPage() {
                     {/* Message */}
                     <div className="mb-8">
                         <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
-                            📝 Message
+                            <FileText size={14} className="inline mr-2" /> Message
                         </h2>
                         <p className="text-lg leading-relaxed" style={{ color: 'var(--text-primary)' }}>
                             &quot;{linkData.message}&quot;
@@ -362,7 +369,7 @@ export default function LinkDetailsPage() {
                     {/* Link Preview Card */}
                     <div className="mb-6">
                         <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
-                            🔗 Link
+                            <LinkIcon size={14} className="inline mr-2" /> Link
                         </h2>
                         <a
                             href={linkData.url}
@@ -408,7 +415,7 @@ export default function LinkDetailsPage() {
                         rel="noreferrer"
                         className="btn-glass w-full text-center text-lg font-bold block"
                     >
-                        🚀 Open Link
+                        <ExternalLink size={18} className="inline mr-2" /> Open Link
                     </a>
 
                 </div>
