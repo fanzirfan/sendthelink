@@ -258,7 +258,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: heart-pulse 2s ease-in-out infinite;
 }
 
 .donate-button__text {

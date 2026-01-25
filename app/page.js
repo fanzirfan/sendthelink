@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import Link from "next/link";
-import { Gamepad2, Palette, Laptop, BookOpen, Hammer, Bot, Music, Film, PenTool, Smartphone, Monitor, Box, CheckCircle, Search, Copy, Flag, RefreshCw, AlertTriangle, XCircle, Info, Tag, Lock, EyeOff, Rocket, ArrowUp, Shield, Mail, Heart, SearchCheck, Link as LinkIcon, FileSpreadsheet } from "lucide-react";
+import { Gamepad2, Palette, Laptop, BookOpen, Hammer, Bot, Music, Film, PenTool, Smartphone, Monitor, Box, CheckCircle, Search, Copy, Flag, RefreshCw, AlertTriangle, XCircle, Info, Tag, Lock, EyeOff, Rocket, ArrowUp, Shield, Mail, SearchCheck, Link as LinkIcon, FileSpreadsheet, Coffee } from "lucide-react";
 
 // Helper function to validate image URLs
 const isValidImageUrl = (url) => {
@@ -692,9 +692,9 @@ style={{ color: 'var(--text-secondary)' }}
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"
 style={{ color: 'var(--text-secondary)' }}
-              title="Support the developer"
+              title="Buy me a coffee"
             >
-              <Heart size={14} className="inline mr-1 fill-current" /> Donate
+              <Coffee size={14} className="inline mr-1" /> Buy me a coffee
             </a>
           </p>
         </footer>
