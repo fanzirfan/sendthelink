@@ -2,22 +2,23 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { Gamepad2, Palette, Laptop, BookOpen, Hammer, Bot, Music, Film, PenTool, Smartphone, Monitor, Box, Shield, Eye, RefreshCw, Image as ImageIcon, Trash, Tag, Search as SearchIcon, Clock, AlertTriangle, CheckCircle, XCircle, Save, LogOut, Filter, MoreVertical, Edit } from "lucide-react";
 
 // Available tags for categorization (must match page.js)
 const AVAILABLE_TAGS = [
-    { id: '3d', label: '3D Assets', emoji: '🎮' },
-    { id: 'design', label: 'Design', emoji: '🎨' },
-    { id: 'code', label: 'Code', emoji: '💻' },
-    { id: 'tutorial', label: 'Tutorial', emoji: '📚' },
-    { id: 'tools', label: 'Tools', emoji: '🛠️' },
-    { id: 'ai', label: 'AI', emoji: '🤖' },
-    { id: 'music', label: 'Music', emoji: '🎵' },
-    { id: 'video', label: 'Video', emoji: '🎬' },
-    { id: 'fonts', label: 'Fonts', emoji: '✍️' },
-    { id: 'game', label: 'Game', emoji: '🕹️' },
-    { id: 'android', label: 'Android', emoji: '🤖' },
-    { id: 'windows', label: 'Windows', emoji: '🪟' },
-    { id: 'other', label: 'Other', emoji: '📦' },
+    { id: '3d', label: '3D Assets', icon: Gamepad2 },
+    { id: 'design', label: 'Design', icon: Palette },
+    { id: 'code', label: 'Code', icon: Laptop },
+    { id: 'tutorial', label: 'Tutorial', icon: BookOpen },
+    { id: 'tools', label: 'Tools', icon: Hammer },
+    { id: 'ai', label: 'AI', icon: Bot },
+    { id: 'music', label: 'Music', icon: Music },
+    { id: 'video', label: 'Video', icon: Film },
+    { id: 'fonts', label: 'Fonts', icon: PenTool },
+    { id: 'game', label: 'Game', icon: Gamepad2 },
+    { id: 'android', label: 'Android', icon: Smartphone },
+    { id: 'windows', label: 'Windows', icon: Monitor },
+    { id: 'other', label: 'Other', icon: Box },
 ];
 
 export default function AdminPanel() {
@@ -249,13 +250,13 @@ const handleLogout = () => {
         setTimeout(() => setPreviewResult(null), 5000);
     };
 
-    // Login Screen
+// Login Screen
     if (!authenticated) {
         return (
             <main className="min-h-screen flex items-center justify-center p-4">
                 <div className="glass-card p-8 max-w-md w-full">
-                    <h1 className="text-3xl font-bold mb-6 text-center">
-                        🔐 Admin Login
+                    <h1 className="text-3xl font-bold mb-6 text-center flex items-center justify-center gap-2">
+                        <Shield size={32} /> Admin Login
                     </h1>
                     <form onSubmit={handleLogin} className="space-y-4">
                         <input
@@ -294,22 +295,22 @@ const handleLogout = () => {
                         <button
                             onClick={handleRefreshPreviews}
                             disabled={refreshingPreviews}
-                            className="px-3 py-2 text-sm rounded-lg bg-green-500/20 hover:bg-green-500/30 transition disabled:opacity-50"
+                            className="px-3 py-2 text-sm rounded-lg bg-green-500/20 hover:bg-green-500/30 transition disabled:opacity-50 flex items-center gap-1"
                             title="Refresh missing link preview images"
                         >
-                            {refreshingPreviews ? '⏳ Refreshing...' : '🖼️ Refresh Previews'}
+                            {refreshingPreviews ? <><Clock size={14} className="animate-spin" /> Refreshing...</> : <><ImageIcon size={14} /> Refresh Previews</>}
                         </button>
                         <button
                             onClick={fetchLinks}
-                            className="px-3 py-2 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition"
+                            className="px-3 py-2 text-sm rounded-lg bg-white/10 hover:bg-white/20 transition flex items-center gap-1"
                         >
-                            🔄 Refresh
+                            <RefreshCw size={14} /> Refresh
                         </button>
                         <button
                             onClick={handleLogout}
-                            className="px-3 py-2 text-sm rounded-lg bg-red-500/20 hover:bg-red-500/30 transition"
+                            className="px-3 py-2 text-sm rounded-lg bg-red-500/20 hover:bg-red-500/30 transition flex items-center gap-1"
                         >
-                            🚪 Logout
+                            <LogOut size={14} /> Logout
                         </button>
 </div>
                 </div>
@@ -343,7 +344,7 @@ const handleLogout = () => {
                         <div className="text-xl md:text-3xl font-bold text-orange-300">
                             {links.filter(l => l.securityStatus === 'suspicious' || l.securityStatus === 'malicious').length}
                         </div>
-                        <div className="text-xs md:text-sm" style={{ color: 'var(--text-secondary)' }}>🛡️ Security</div>
+                        <div className="text-xs md:text-sm flex items-center gap-1" style={{ color: 'var(--text-secondary)' }}><Shield size={14} /> Security</div>
                     </div>
                     <div className="glass-card p-3 md:p-5">
                         <div className="text-xl md:text-3xl font-bold text-blue-300">
@@ -405,18 +406,21 @@ const handleLogout = () => {
                                 className={`px-3 py-1.5 text-sm rounded-lg transition ${filter === "mostviewed" ? "bg-pink-500" : "bg-white/10 hover:bg-white/20"
                                     }`}
                             >
-                                👁️ Most Viewed
+                                <Eye size={14} className="inline mr-1" /> Most Viewed
                             </button>
                         </div>
 
-                        {/* Search */}
-                        <input
-                            type="text"
-                            placeholder="Search links..."
-                            className="input-glass w-full"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+{/* Search */}
+                        <div className="relative">
+                            <SearchIcon size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search links..."
+                                className="input-glass w-full pl-10"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -424,7 +428,7 @@ const handleLogout = () => {
                 {deleteConfirm && (
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
                         <div className="glass-card p-6 max-w-md w-full">
-                            <h3 className="text-xl font-bold mb-4 text-red-400">🗑️ Delete Link?</h3>
+                            <h3 className="text-xl font-bold mb-4 text-red-400 flex items-center gap-2"><Trash size={24} /> Delete Link?</h3>
                             <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
                                 Are you sure you want to permanently delete this link? This action cannot be undone.
                             </p>
@@ -450,7 +454,7 @@ const handleLogout = () => {
                 {editingLink && (
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
                         <div className="glass-card p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                            <h2 className="text-2xl font-bold mb-4">✏️ Edit Link</h2>
+                            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><Edit size={24} /> Edit Link</h2>
 
                             <form onSubmit={(e) => {
                                 e.preventDefault();
@@ -499,8 +503,8 @@ const handleLogout = () => {
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">🏷️ Tags:</label>
+<div>
+                                    <label className="block text-sm font-medium mb-2 flex items-center gap-2"><Tag size={16} /> Tags:</label>
                                     <div className="flex flex-wrap gap-2">
                                         {AVAILABLE_TAGS.map((tag) => (
                                             <button
@@ -517,31 +521,31 @@ const handleLogout = () => {
                                                     : 'bg-white/10 hover:bg-white/20'
                                                     }`}
                                             >
-                                                {tag.emoji} {tag.label}
+                                                <tag.icon size={14} className="inline mr-1" /> {tag.label}
                                             </button>
                                         ))}
                                     </div>
                                     {editTags.length === 0 && (
-                                        <p className="text-xs text-yellow-300 mt-2">⚠️ At least one tag is required</p>
+                                        <p className="text-xs text-yellow-300 mt-2 flex items-center gap-1"><AlertTriangle size={12} /> At least one tag is required</p>
                                     )}
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">📋 Status:</label>
+<div>
+                                    <label className="block text-sm font-medium mb-2 flex items-center gap-2"><Filter size={16} /> Status:</label>
                                     <select
                                         value={editStatus}
                                         onChange={(e) => setEditStatus(e.target.value)}
                                         className="input-glass w-full cursor-pointer"
                                     >
-                                        <option value="approved" className="bg-gray-900">✅ Approved (Visible)</option>
-                                        <option value="pending_review" className="bg-gray-900">🔍 Pending Review (Hidden)</option>
-                                        <option value="flagged" className="bg-gray-900">🚩 Flagged (Hidden)</option>
-                                        <option value="rejected" className="bg-gray-900">❌ Rejected (Hidden)</option>
+                                        <option value="approved" className="bg-gray-900"><CheckCircle size={14} className="inline mr-1" /> Approved (Visible)</option>
+                                        <option value="pending_review" className="bg-gray-900"><Clock size={14} className="inline mr-1" /> Pending Review (Hidden)</option>
+                                        <option value="flagged" className="bg-gray-900"><AlertTriangle size={14} className="inline mr-1" /> Flagged (Hidden)</option>
+                                        <option value="rejected" className="bg-gray-900"><XCircle size={14} className="inline mr-1" /> Rejected (Hidden)</option>
                                     </select>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">✓ Verified Status:</label>
+<div>
+                                    <label className="block text-sm font-medium mb-2 flex items-center gap-2"><CheckCircle size={16} /> Verified Status:</label>
                                     <div className="flex gap-3">
                                         <button
                                             type="button"
@@ -551,7 +555,7 @@ const handleLogout = () => {
                                                 : 'bg-white/10 hover:bg-white/20'
                                                 }`}
                                         >
-                                            ✓ Verified
+                                            <CheckCircle size={16} className="inline mr-1" /> Verified
                                         </button>
                                         <button
                                             type="button"
@@ -566,12 +570,12 @@ const handleLogout = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex gap-3 pt-4">
+<div className="flex gap-3 pt-4">
                                     <button
                                         type="submit"
                                         className="btn-glass flex-1"
                                     >
-                                        💾 Save Changes
+                                        <Save size={20} className="inline mr-2" /> Save Changes
                                     </button>
                                     <button
                                         type="button"
@@ -646,26 +650,26 @@ const handleLogout = () => {
                                         {/* Tags + Reports */}
                                         <div className="flex items-center justify-between mb-3">
                                             <div className="flex gap-1">
-                                                {link.tags?.slice(0, 3).map(tagId => {
+{link.tags?.slice(0, 3).map(tagId => {
                                                     const tag = AVAILABLE_TAGS.find(t => t.id === tagId);
                                                     return tag ? (
-                                                        <span key={tagId} className="text-xs px-1.5 py-0.5 rounded bg-purple-500/30">
-                                                            {tag.emoji}
+                                                        <span key={tagId} className="text-xs px-1.5 py-0.5 rounded bg-purple-500/30 flex items-center gap-1">
+                                                            <tag.icon size={12} />
                                                         </span>
                                                     ) : null;
                                                 })}
                                             </div>
                                             {(link.reportCount || 0) > 0 && (
-                                                <span className="text-xs text-yellow-300">⚠️ {link.reportCount} reports</span>
+                                                <span className="text-xs text-yellow-300 flex items-center gap-1"><AlertTriangle size={12} /> {link.reportCount} reports</span>
                                             )}
-                                            <div className="text-xs text-blue-200 bg-blue-500/10 px-2 py-0.5 rounded">
-                                                👁️ {link.views || 0} views
+                                            <div className="text-xs text-blue-200 bg-blue-500/10 px-2 py-0.5 rounded flex items-center gap-1">
+                                                <Eye size={12} /> {link.views || 0} views
                                             </div>
                                         </div>
 
                                         {/* Actions */}
                                         <div className="flex gap-2">
-                                            <button
+<button
                                                 onClick={() => {
                                                     setEditingLink(link);
                                                     setEditTags(link.tags || []);
@@ -674,7 +678,7 @@ const handleLogout = () => {
                                                 }}
                                                 className="flex-1 text-xs py-2 rounded bg-blue-500/20 hover:bg-blue-500/30 transition"
                                             >
-                                                ✏️ Edit
+                                                <Edit size={14} className="inline mr-1" /> Edit
                                             </button>
                                             <button
                                                 onClick={() => handleUpdate(link.id, {
@@ -682,13 +686,13 @@ const handleLogout = () => {
                                                 })}
                                                 className="flex-1 text-xs py-2 rounded bg-yellow-500/20 hover:bg-yellow-500/30 transition"
                                             >
-                                                {link.status === 'flagged' ? '✅ Approve' : '🚩 Flag'}
+                                                {link.status === 'flagged' ? <><CheckCircle size={14} className="inline mr-1" /> Approve</> : <><AlertTriangle size={14} className="inline mr-1" /> Flag</>}
                                             </button>
                                             <button
                                                 onClick={() => setDeleteConfirm(link.id)}
                                                 className="text-xs px-4 py-2 rounded bg-red-500/20 hover:bg-red-500/30 transition"
                                             >
-                                                🗑️
+                                                <Trash size={14} />
                                             </button>
                                         </div>
                                     </div>
@@ -726,11 +730,11 @@ const handleLogout = () => {
                                                 <td className="p-3 text-sm">
                                                     <div className="flex flex-wrap gap-1 max-w-[150px]">
                                                         {link.tags && link.tags.length > 0 ? (
-                                                            link.tags.slice(0, 2).map(tagId => {
+link.tags.slice(0, 2).map(tagId => {
                                                                 const tag = AVAILABLE_TAGS.find(t => t.id === tagId);
                                                                 return tag ? (
-                                                                    <span key={tagId} className="text-xs px-1.5 py-0.5 rounded bg-purple-500/30">
-                                                                        {tag.emoji}
+                                                                    <span key={tagId} className="text-xs px-1.5 py-0.5 rounded bg-purple-500/30 flex items-center gap-1">
+                                                                        <tag.icon size={12} />
                                                                     </span>
                                                                 ) : null;
                                                             })
@@ -754,7 +758,7 @@ const handleLogout = () => {
                                                 </td>
                                                 <td className="p-3 text-sm">
                                                     <div className="flex items-center gap-1">
-                                                        👁️ {link.views || 0}
+                                                        <Eye size={14} /> {link.views || 0}
                                                     </div>
                                                 </td>
                                                 <td className="p-3 text-sm">
@@ -763,16 +767,16 @@ const handleLogout = () => {
                                                     </span>
                                                 </td>
                                                 <td className="p-3 text-sm">
-                                                    <span className={`px-2 py-1 rounded text-xs ${link.securityStatus === 'malicious' ? 'bg-red-500/20 text-red-300' :
+<span className={`px-2 py-1 rounded text-xs ${link.securityStatus === 'malicious' ? 'bg-red-500/20 text-red-300' :
                                                         link.securityStatus === 'suspicious' ? 'bg-orange-500/20 text-orange-300' :
                                                             link.securityStatus === 'safe' ? 'bg-green-500/20 text-green-300' :
                                                                 'bg-gray-500/20 text-gray-300'
                                                         }`}>
-                                                        {link.securityStatus === 'malicious' ? '🚨 Malicious' :
-                                                            link.securityStatus === 'suspicious' ? '⚠️ Suspicious' :
-                                                                link.securityStatus === 'safe' ? '✅ Safe' :
-                                                                    link.securityStatus === 'pending' ? '🔄 Scanning' :
-                                                                        '❓ Unknown'}
+                                                        {link.securityStatus === 'malicious' ? <><AlertTriangle size={12} className="inline mr-1" /> Malicious</> :
+                                                            link.securityStatus === 'suspicious' ? <><AlertTriangle size={12} className="inline mr-1" /> Suspicious</> :
+                                                                link.securityStatus === 'safe' ? <><CheckCircle size={12} className="inline mr-1" /> Safe</> :
+                                                                    link.securityStatus === 'pending' ? <><RefreshCw size={12} className="inline mr-1 animate-spin" /> Scanning</> :
+                                                                        '? Unknown'}
                                                     </span>
                                                 </td>
                                                 <td className="p-3 text-sm">
@@ -785,7 +789,7 @@ const handleLogout = () => {
                                                 </td>
                                                 <td className="p-3">
                                                     <div className="flex gap-2">
-                                                        <button
+<button
                                                             onClick={() => {
                                                                 setEditingLink(link);
                                                                 setEditTags(link.tags || []);
@@ -795,7 +799,7 @@ const handleLogout = () => {
                                                             className="text-xs px-3 py-1 rounded bg-blue-500/20 hover:bg-blue-500/30 transition"
                                                             title="Edit"
                                                         >
-                                                            ✏️
+                                                            <Edit size={14} />
                                                         </button>
                                                         <button
                                                             onClick={() => handleUpdate(link.id, {
@@ -804,14 +808,14 @@ const handleLogout = () => {
                                                             className="text-xs px-3 py-1 rounded bg-yellow-500/20 hover:bg-yellow-500/30 transition"
                                                             title={link.status === 'flagged' ? 'Approve' : 'Flag'}
                                                         >
-                                                            {link.status === 'flagged' ? '✅' : '🚩'}
+                                                            {link.status === 'flagged' ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
                                                         </button>
                                                         <button
                                                             onClick={() => setDeleteConfirm(link.id)}
                                                             className="text-xs px-3 py-1 rounded bg-red-500/20 hover:bg-red-500/30 transition"
                                                             title="Delete"
                                                         >
-                                                            🗑️
+                                                            <Trash size={14} />
                                                         </button>
                                                     </div>
                                                 </td>

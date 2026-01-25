@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import Link from "next/link";
+import { Gamepad2, Palette, Laptop, BookOpen, Hammer, Bot, Music, Film, PenTool, Smartphone, Monitor, Box, CheckCircle, Search, Copy, Flag, RefreshCw, AlertTriangle, XCircle, Info, Tag, Lock, EyeOff, Rocket, ArrowUp, Shield, Mail, Heart, SearchCheck, Link as LinkIcon, FileSpreadsheet } from "lucide-react";
 
 // Helper function to validate image URLs
 const isValidImageUrl = (url) => {
@@ -13,19 +14,19 @@ const isValidImageUrl = (url) => {
 
 // Available tags for categorization
 const AVAILABLE_TAGS = [
-  { id: '3d', label: '3D Assets', emoji: '🎮' },
-  { id: 'design', label: 'Design', emoji: '🎨' },
-  { id: 'code', label: 'Code', emoji: '💻' },
-  { id: 'tutorial', label: 'Tutorial', emoji: '📚' },
-  { id: 'tools', label: 'Tools', emoji: '🛠️' },
-  { id: 'ai', label: 'AI', emoji: '🤖' },
-  { id: 'music', label: 'Music', emoji: '🎵' },
-  { id: 'video', label: 'Video', emoji: '🎬' },
-  { id: 'fonts', label: 'Fonts', emoji: '✍️' },
-  { id: 'game', label: 'Game', emoji: '🕹️' },
-  { id: 'android', label: 'Android', emoji: '🤖' },
-  { id: 'windows', label: 'Windows', emoji: '🪟' },
-  { id: 'other', label: 'Other', emoji: '📦' },
+  { id: '3d', label: '3D Assets', icon: Gamepad2 },
+  { id: 'design', label: 'Design', icon: Palette },
+  { id: 'code', label: 'Code', icon: Laptop },
+  { id: 'tutorial', label: 'Tutorial', icon: BookOpen },
+  { id: 'tools', label: 'Tools', icon: Hammer },
+  { id: 'ai', label: 'AI', icon: Bot },
+  { id: 'music', label: 'Music', icon: Music },
+  { id: 'video', label: 'Video', icon: Film },
+  { id: 'fonts', label: 'Fonts', icon: PenTool },
+  { id: 'game', label: 'Game', icon: Gamepad2 },
+  { id: 'android', label: 'Android', icon: Smartphone },
+  { id: 'windows', label: 'Windows', icon: Monitor },
+  { id: 'other', label: 'Other', icon: Box },
 ];
 
 export default function Home() {
@@ -123,9 +124,9 @@ export default function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate tags (minimum 1 required)
+// Validate tags (minimum 1 required)
     if (form.tags.length === 0) {
-      showToast('⚠️ Please select at least one tag', 'warning');
+      showToast('Please select at least one tag', 'warning');
       return;
     }
 
@@ -142,8 +143,8 @@ export default function Home() {
         });
         const captchaData = await captchaRes.json();
 
-        if (!captchaData.success) {
-          showToast('❌ Security verification failed. Please try again.', 'error');
+if (!captchaData.success) {
+          showToast('Security verification failed. Please try again.', 'error');
           setLoading(false);
           return;
         }
@@ -157,8 +158,8 @@ export default function Home() {
       });
       const moderateData = await moderateRes.json();
 
-      if (!moderateData.safe) {
-        showToast(`⚠️ Link Blocked: ${moderateData.reason}`, 'error');
+if (!moderateData.safe) {
+        showToast(`Link Blocked: ${moderateData.reason}`, 'error');
         setLoading(false);
         return;
       }
@@ -191,34 +192,34 @@ export default function Home() {
 
       const submitData = await submitRes.json();
 
-      if (!submitRes.ok) {
+if (!submitRes.ok) {
         if (submitRes.status === 429) {
-          showToast(`⚠️ Rate limit exceeded. Please wait ${submitData.retryAfter} seconds.`, 'error');
+          showToast(`Rate limit exceeded. Please wait ${submitData.retryAfter} seconds.`, 'error');
         } else {
-          showToast(`❌ ${submitData.error || 'Failed to submit link'}`, 'error');
+          showToast(`${submitData.error || 'Failed to submit link'}`, 'error');
         }
         setLoading(false);
         return;
       }
 
-      // Reset form
+// Reset form
       setForm({ from: "", message: "", url: "", isAnonymous: false, tags: [], verifyPassword: "" });
-      showToast("✅ Link shared successfully!\n🔍 Link is being scanned for security, please wait...", "success");
+      showToast("Link shared successfully!\nLink is being scanned for security, please wait...", "success");
 
-    } catch (error) {
+} catch (error) {
       console.error(error);
-      showToast("❌ Failed to share link. Please try again.", "error");
+      showToast("Failed to share link. Please try again.", "error");
     }
 
     setLoading(false);
   };
 
   // Handle copy link button - copies the actual URL
-  const handleCopyLink = (url) => {
+const handleCopyLink = (url) => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(url)
         .then(() => {
-          showToast(`📋 Link copied!`, "success");
+          showToast(`Link copied!`, "success");
         })
         .catch((err) => {
           console.error('Clipboard error:', err);
@@ -250,12 +251,12 @@ export default function Home() {
     }
   };
 
-  // Helper function to copy to clipboard
+// Helper function to copy to clipboard
   const copyToClipboard = (text) => {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text)
         .then(() => {
-          showToast(`🔗 Details link copied!`, "success");
+          showToast(`Details link copied!`, "success");
         })
         .catch(() => {
           showToast(text, "info");
@@ -271,10 +272,10 @@ export default function Home() {
     setReportReason("");
   };
 
-  // Submit report
+// Submit report
   const submitReport = async () => {
     if (!reportReason.trim()) {
-      showToast("ℹ️ Please enter a reason for reporting", "warning");
+      showToast("Please enter a reason for reporting", "warning");
       return;
     }
 
@@ -294,16 +295,16 @@ export default function Home() {
 
       const data = await res.json();
 
-      if (data.alreadyReported) {
-        showToast("⚠️ You've already reported this link", "warning");
+if (data.alreadyReported) {
+        showToast("You've already reported this link", "warning");
       } else if (data.success) {
-        showToast(`✅ Report submitted! (Total: ${data.reportCount})`, "success");
+        showToast(`Report submitted! (Total: ${data.reportCount})`, "success");
       } else {
-        showToast("❌ Failed to submit report", "error");
+        showToast("Failed to submit report", "error");
       }
     } catch (error) {
       console.error('Report error:', error);
-      showToast("❌ Network error. Please try again.", "error");
+      showToast("Network error. Please try again.", "error");
     }
 
     setReportModal(null);
@@ -330,8 +331,8 @@ export default function Home() {
         {/* Report Modal */}
         {reportModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-            <div className="glass-card p-6 max-w-md w-full">
-              <h3 className="text-xl font-bold mb-4">🚩 Report Inappropriate Content</h3>
+<div className="glass-card p-6 max-w-md w-full">
+              <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Flag size={20} className="text-red-500" /> Report Inappropriate Content</h3>
               <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                 Please tell us why you&apos;re reporting this link:
               </p>
@@ -404,10 +405,10 @@ export default function Home() {
               onChange={(e) => setForm({ ...form, message: e.target.value })}
             />
 
-            {/* Tag Selector */}
+{/* Tag Selector */}
             <div>
-              <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>
-                🏷️ Select Tags (min 1 required)
+              <label className="block text-sm mb-2 flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
+                <Tag size={16} /> Select Tags (min 1 required)
               </label>
               <div className="flex flex-wrap gap-2">
                 {AVAILABLE_TAGS.map((tag) => (
@@ -422,24 +423,27 @@ export default function Home() {
                     }}
                     className={`tag-chip ${form.tags.includes(tag.id) ? 'active' : ''}`}
                   >
-                    {tag.emoji} {tag.label}
+                    <tag.icon size={16} className="inline mr-1" /> {tag.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Verified Password (Optional) */}
+{/* Verified Password (Optional) */}
             <div>
-              <input
-                type="password"
-                placeholder="🔐 Verification Password (optional - for verified badge)"
-                className="input-glass w-full"
-                value={form.verifyPassword}
-                onChange={(e) => setForm({ ...form, verifyPassword: e.target.value })}
-              />
+              <div className="relative">
+                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="password"
+                  placeholder="Verification Password (optional - for verified badge)"
+                  className="input-glass w-full pl-10"
+                  value={form.verifyPassword}
+                  onChange={(e) => setForm({ ...form, verifyPassword: e.target.value })}
+                />
+              </div>
             </div>
 
-            {/* Anonymous Checkbox */}
+{/* Anonymous Checkbox */}
             <div className="flex items-center gap-3">
               <input
                 type="checkbox"
@@ -448,41 +452,44 @@ export default function Home() {
                 onChange={(e) => setForm({ ...form, isAnonymous: e.target.checked })}
                 className="w-5 h-5 accent-purple-500 cursor-pointer"
               />
-              <label htmlFor="anonymous" className="cursor-pointer text-sm" style={{ color: 'var(--text-secondary)' }}>
-                🕶️ Send Anonymously (hide my name)
+              <label htmlFor="anonymous" className="cursor-pointer text-sm flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
+                <EyeOff size={16} /> Send Anonymously (hide my name)
               </label>
             </div>
 
-            <button
+<button
               disabled={loading}
               type="submit"
-              className="btn-glass w-full text-lg font-bold"
+              className="btn-glass w-full text-lg font-bold flex items-center justify-center gap-2"
             >
-              {loading ? "🔄 Processing..." : "Send Link 🚀"}
+              {loading ? <RefreshCw size={20} className="animate-spin" /> : <><span>Send Link</span><Rocket size={20} /></>}
             </button>
 
           </form>
         </div>
 
-        {/* Search Bar */}
+{/* Search Bar */}
         <div className="mb-4 fade-in-up" style={{ animationDelay: '0.2s' }}>
-          <input
-            type="text"
-            placeholder="🔍 Search links by sender, message, or URL..."
-            className="input-glass w-full"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <div className="relative">
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search links by sender, message, or URL..."
+              className="input-glass w-full pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
 
         {/* Tag Filter Buttons */}
         <div className="mb-8 fade-in-up" style={{ animationDelay: '0.25s' }}>
-          <div className="flex flex-wrap gap-2">
+<div className="flex flex-wrap gap-2">
             <button
               onClick={() => setActiveTagFilter(null)}
               className={`tag-filter ${!activeTagFilter ? 'active' : ''}`}
             >
-              📚 All
+              <BookOpen size={16} className="inline mr-1" /> All
             </button>
             {AVAILABLE_TAGS.map((tag) => (
               <button
@@ -490,7 +497,7 @@ export default function Home() {
                 onClick={() => setActiveTagFilter(activeTagFilter === tag.id ? null : tag.id)}
                 className={`tag-filter ${activeTagFilter === tag.id ? 'active' : ''}`}
               >
-                {tag.emoji} {tag.label}
+                <tag.icon size={16} className="inline mr-1" /> {tag.label}
               </button>
             ))}
           </div>
@@ -524,7 +531,7 @@ export default function Home() {
                 </div>
                 {/* Buttons row */}
                 <div className="flex gap-2">
-                  {/* Share Details Button */}
+{/* Share Details Button */}
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -534,7 +541,7 @@ export default function Home() {
                     className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 transition font-semibold"
                     title="Share this content"
                   >
-                    🔗 <span className="hidden sm:inline">Share</span>
+                    <LinkIcon size={16} className="inline" /> <span className="hidden sm:inline">Share</span>
                   </button>
                   {/* Copy Link Button */}
                   <button
@@ -546,7 +553,7 @@ export default function Home() {
                     className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 transition font-semibold"
                     title="Copy original link to clipboard"
                   >
-                    📋 <span className="hidden sm:inline">Copy</span>
+                    <Copy size={16} className="inline" /> <span className="hidden sm:inline">Copy</span>
                   </button>
                   {/* Report Button */}
                   <button
@@ -558,19 +565,19 @@ export default function Home() {
                     className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition font-semibold"
                     title="Report inappropriate content"
                   >
-                    🚩
+                    <Flag size={16} className="inline" />
                   </button>
                 </div>
               </div>
 
-              {/* Tags */}
+{/* Tags */}
               {item.tags && item.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-3">
                   {item.tags.map(tagId => {
                     const tag = AVAILABLE_TAGS.find(t => t.id === tagId);
                     return tag ? (
-                      <span key={tagId} className="tag-display">
-                        {tag.emoji} {tag.label}
+                      <span key={tagId} className="tag-display flex items-center gap-1">
+                        <tag.icon size={12} /> {tag.label}
                       </span>
                     ) : null;
                   })}
@@ -597,9 +604,9 @@ export default function Home() {
                       loading="lazy"
                       onError={(e) => { e.target.style.display = 'none'; }}
                     />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-2xl">🔗</div>
-                  )}
+) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400"><LinkIcon size={24} /></div>
+                   )}
                 </div>
 
                 {/* Link Info */}
@@ -619,9 +626,9 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* View Details Hint */}
-              <div className="mt-3 text-xs text-center" style={{ color: 'var(--text-muted)' }}>
-                👆 Click card &quot;View Details&quot;
+{/* View Details Hint */}
+              <div className="mt-3 text-xs text-center flex items-center justify-center gap-1" style={{ color: 'var(--text-muted)' }}>
+                <ArrowUp size={14} /> Click card &quot;View Details&quot;
               </div>
 
             </Link>
@@ -640,29 +647,29 @@ export default function Home() {
               href="https://www.virustotal.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs hover:text-white transition-colors flex items-center gap-1"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              🛡️ Secured by VirusTotal
-            </a>
+className="text-xs hover:text-white transition-colors flex items-center gap-1"
+               style={{ color: 'var(--text-secondary)' }}
+             >
+               <Shield size={14} /> Secured by VirusTotal
+             </a>
             <span className="text-xs" style={{ color: 'var(--text-muted)' }}>•</span>
             <a
               href="https://urlscan.io"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs hover:text-white transition-colors flex items-center gap-1"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              🔍 Scanned by URLScan.io
-            </a>
+className="text-xs hover:text-white transition-colors flex items-center gap-1"
+               style={{ color: 'var(--text-secondary)' }}
+             >
+               <SearchCheck size={14} /> Scanned by URLScan.io
+             </a>
             <span className="text-xs" style={{ color: 'var(--text-muted)' }}>•</span>
             <a
               href="/analytics-policy"
-              className="text-xs hover:text-white transition-colors flex items-center gap-1"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              📊 Analytics Policy
-            </a>
+className="text-xs hover:text-white transition-colors flex items-center gap-1"
+               style={{ color: 'var(--text-secondary)' }}
+             >
+               <FileSpreadsheet size={14} /> Analytics Policy
+             </a>
           </div>
 
           <p className="text-xs mt-4" style={{ color: 'var(--text-muted)' }}>
@@ -673,10 +680,10 @@ export default function Home() {
             <a
               href="mailto:dmca@manji.eu.org"
               className="hover:text-white transition-colors"
-              style={{ color: 'var(--text-secondary)' }}
+style={{ color: 'var(--text-secondary)' }}
               title="Report copyright infringement"
             >
-              📧 DMCA Takedown Request
+              <Mail size={14} className="inline mr-1" /> DMCA Takedown Request
             </a>
             <span className="mx-4" style={{ color: 'var(--text-muted)' }}>•</span>
             <a
@@ -684,10 +691,10 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-white transition-colors"
-              style={{ color: 'var(--text-secondary)' }}
+style={{ color: 'var(--text-secondary)' }}
               title="Support the developer"
             >
-              ❤️ Donate
+              <Heart size={14} className="inline mr-1 fill-current" /> Donate
             </a>
           </p>
         </footer>
