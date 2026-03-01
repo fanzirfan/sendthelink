@@ -8,7 +8,17 @@ import Link from "next/link";
 export default function AnalyticsPolicy() {
     return (
         <div className="min-h-screen py-10 px-4 flex justify-center">
-            <div className="w-full max-w-3xl glass-card p-8 animate-slide-in">
+            <div className="w-full max-w-3xl glass-card terminal-card overflow-hidden animate-slide-in">
+                <div className="terminal-window-bar">
+                    <div className="terminal-dots">
+                        <span className="terminal-dot red"></span>
+                        <span className="terminal-dot yellow"></span>
+                        <span className="terminal-dot green"></span>
+                    </div>
+                    <span className="terminal-title">sendthelink://analytics-policy</span>
+                    <span className="w-8" aria-hidden="true"></span>
+                </div>
+                <div className="p-8">
 
                 {/* Header */}
                 <div className="mb-8 border-b border-[var(--border)] pb-6">
@@ -99,6 +109,7 @@ export default function AnalyticsPolicy() {
                         </p>
                     </div>
 
+                </div>
                 </div>
             </div>
         </div>

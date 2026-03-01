@@ -114,7 +114,7 @@ export const metadata = {
 
 // Viewport configuration (Next.js 16+ requirement)
 export const viewport = {
-  themeColor: "#110820",
+  themeColor: "#0a0f0d",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,

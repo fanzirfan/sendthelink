@@ -1,44 +1,48 @@
 @import "tailwindcss";
 
 :root {
-  /* Shadcn Zinc + Purple Theme (Dark Mode) */
+  /* Terminal theme */
   --radius: 0.375rem;
 
   /* Background & Foreground */
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
+  --background: #0a0f0d;
+  --foreground: #d8e3dc;
 
   /* Card */
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.985 0 0);
+  --card: #101715;
+  --card-foreground: #d8e3dc;
 
   /* Popover */
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.985 0 0);
+  --popover: #101715;
+  --popover-foreground: #d8e3dc;
 
   /* Primary (Purple) */
-  --primary: oklch(0.627 0.265 303.9);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #65f7b2;
+  --primary-foreground: #04120c;
 
   /* Secondary */
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
+  --secondary: #141d1a;
+  --secondary-foreground: #c4d5cc;
 
   /* Muted */
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
+  --muted: #141d1a;
+  --muted-foreground: #8ea39a;
 
   /* Accent */
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: #192520;
+  --accent-foreground: #d8e3dc;
 
   /* Destructive */
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: #ff6b6b;
+
+  --text-primary: #d8e3dc;
+  --text-secondary: #b5c7bf;
+  --text-muted: #8ea39a;
 
   /* Border & Input */
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.627 0.265 303.9);
+  --border: #2b3a34;
+  --input: #141d1a;
+  --ring: #65f7b2;
 }
 
 @theme inline {
@@ -66,6 +70,7 @@
 body {
   margin-top: 35px;
   background-color: var(--background);
+  background-image: radial-gradient(circle at 20% 0%, rgba(101, 247, 178, 0.1), transparent 35%), radial-gradient(circle at 100% 100%, rgba(101, 247, 178, 0.06), transparent 30%);
   color: var(--foreground);
   font-family: var(--font-mono), 'JetBrains Mono', ui-monospace, monospace;
   min-height: 100vh;
@@ -75,34 +80,34 @@ body {
 /* Card Component */
 .glass-card {
   background-color: var(--card);
-  border-radius: var(--radius);
+  border-radius: 0.75rem;
   border: 1px solid var(--border);
-  box-shadow: 0 4px 16px oklch(0 0 0 / 20%);
+  box-shadow: 0 0 0 1px rgba(101, 247, 178, 0.08), 0 12px 28px rgba(0, 0, 0, 0.35);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .glass-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px oklch(0 0 0 / 30%);
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px rgba(101, 247, 178, 0.15), 0 14px 30px rgba(0, 0, 0, 0.38);
 }
 
 /* Primary Button */
 .btn-glass {
-  background-color: var(--primary);
-  border: 1px solid var(--primary);
-  border-radius: var(--radius);
+  background-color: rgba(101, 247, 178, 0.15);
+  border: 1px solid rgba(101, 247, 178, 0.4);
+  border-radius: 0.5rem;
   padding: 12px 24px;
   font-weight: 600;
-  color: var(--primary-foreground);
+  color: var(--foreground);
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px oklch(0.627 0.265 303.9 / 30%);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
 }
 
 .btn-glass:hover {
-  background-color: oklch(0.55 0.265 303.9);
+  background-color: rgba(101, 247, 178, 0.24);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px oklch(0.627 0.265 303.9 / 40%);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
 }
 
 .btn-glass:disabled {
@@ -115,7 +120,7 @@ body {
 .input-glass {
   background-color: var(--input);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 0.5rem;
   padding: 10px 14px;
   color: var(--foreground);
   transition: all 0.2s ease;
@@ -128,7 +133,7 @@ body {
 .input-glass:focus {
   outline: none;
   border-color: var(--ring);
-  box-shadow: 0 0 0 2px oklch(0.627 0.265 303.9 / 25%);
+  box-shadow: 0 0 0 2px rgba(101, 247, 178, 0.25);
 }
 
 /* Animations */
@@ -237,21 +242,21 @@ body {
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
-  box-shadow: 0 4px 16px oklch(0.627 0.265 303.9 / 40%);
+  box-shadow: 0 6px 18px rgba(101, 247, 178, 0.28);
   transition: all 0.2s ease;
   will-change: transform, box-shadow;
 }
 
 .donate-button:hover {
-  background: oklch(0.55 0.265 303.9);
+  background: #7affc2;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px oklch(0.627 0.265 303.9 / 50%);
+  box-shadow: 0 10px 24px rgba(101, 247, 178, 0.34);
   text-decoration: none;
 }
 
 .donate-button:active {
   transform: translateY(0) scale(0.98);
-  box-shadow: 0 2px 8px oklch(0.627 0.265 303.9 / 40%);
+  box-shadow: 0 3px 10px rgba(101, 247, 178, 0.22);
 }
 
 .donate-button__icon {
@@ -297,10 +302,10 @@ body {
 }
 
 .tag-chip.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--primary-foreground);
-  box-shadow: 0 2px 8px oklch(0.627 0.265 303.9 / 30%);
+  background: rgba(101, 247, 178, 0.2);
+  border-color: rgba(101, 247, 178, 0.4);
+  color: var(--foreground);
+  box-shadow: 0 2px 8px rgba(101, 247, 178, 0.18);
 }
 
 /* Tag Filter - Filter Buttons */
@@ -323,7 +328,7 @@ body {
 }
 
 .tag-filter.active {
-  background: oklch(0.627 0.265 303.9 / 20%);
+  background: rgba(101, 247, 178, 0.2);
   border-color: var(--ring);
   color: var(--foreground);
 }
@@ -348,11 +353,11 @@ body {
   border-radius: var(--radius);
   font-size: 11px;
   font-weight: 600;
-  background: #1d9bf0;
-  color: white;
+  background: rgba(101, 247, 178, 0.2);
+  color: #9dffcb;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  box-shadow: 0 2px 8px rgba(29, 155, 240, 0.4);
+  box-shadow: 0 2px 8px rgba(101, 247, 178, 0.2);
 }
 
 /* Verified Icon Only - Like Twitter Blue Check */
@@ -363,10 +368,54 @@ body {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #1d9bf0;
-  color: white;
+  background: rgba(101, 247, 178, 0.2);
+  color: #9dffcb;
   font-size: 11px;
-  box-shadow: 0 2px 6px rgba(29, 155, 240, 0.4);
+  box-shadow: 0 2px 6px rgba(101, 247, 178, 0.2);
+}
+
+.terminal-window-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 12px;
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+  background: rgba(6, 12, 9, 0.85);
+}
+
+.terminal-dots {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.terminal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.terminal-dot.red {
+  background: #ff6b6b;
+}
+
+.terminal-dot.yellow {
+  background: #f7c873;
+}
+
+.terminal-dot.green {
+  background: #65f7b2;
+}
+
+.terminal-title {
+  color: var(--muted-foreground);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+.mini-terminal-card {
+  overflow: hidden;
 }
 
 /* ================================================
@@ -496,6 +545,10 @@ html {
   .glass-card {
     padding: 16px;
   }
+
+  .glass-card.terminal-card {
+    padding: 0;
+  }
 }
 
 /* Small mobile devices */
@@ -515,6 +568,10 @@ html {
   /* Even more compact spacing */
   .glass-card {
     padding: 12px;
+  }
+
+  .glass-card.terminal-card {
+    padding: 0;
   }
 }
 

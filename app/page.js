@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import Link from "next/link";
-import { Gamepad2, Palette, Laptop, BookOpen, Hammer, Bot, Music, Film, PenTool, Smartphone, Monitor, Box, CheckCircle, Search, Copy, Flag, RefreshCw, AlertTriangle, XCircle, Info, Tag, Lock, EyeOff, Rocket, ArrowUp, Shield, Mail, SearchCheck, Link as LinkIcon, FileSpreadsheet, Coffee } from "lucide-react";
+import { Gamepad2, Palette, Laptop, BookOpen, Hammer, Bot, Music, Film, PenTool, Smartphone, Monitor, Box, Search, Copy, Flag, RefreshCw, Tag, Lock, EyeOff, Rocket, ArrowUp, Shield, Mail, SearchCheck, Link as LinkIcon, FileSpreadsheet, Coffee, Plus } from "lucide-react";
 
 // Helper function to validate image URLs
 const isValidImageUrl = (url) => {
@@ -35,6 +35,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTagFilter, setActiveTagFilter] = useState(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   const [recaptchaLoaded, setRecaptchaLoaded] = useState(false);
 
   // Toast notification state
@@ -312,7 +313,7 @@ if (data.alreadyReported) {
   };
 
   return (
-    <main className="min-h-screen px-4 md:px-10 py-8 md:py-10">
+    <main className="min-h-screen px-4 md:px-10 py-8 md:py-10 text-[var(--foreground)]">
       <div className="max-w-6xl mx-auto">
 
         {/* Toast Notification */}
@@ -363,17 +364,48 @@ if (data.alreadyReported) {
         )}
 
         {/* Header */}
-        <header className="mb-10 text-center fade-in-up px-2">
-          <h1 className="text-3xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent">
-            SendTheLink
-          </h1>
-          <p className="text-base md:text-lg" style={{ color: 'var(--text-secondary)' }}>
-            Share useful links with everyone. No login required.
-          </p>
+        <header className="mb-10 fade-in-up px-2">
+          <div className="glass-card terminal-card max-w-3xl lg:max-w-5xl mx-auto overflow-hidden">
+            <div className="terminal-window-bar">
+              <div className="terminal-dots">
+                <span className="terminal-dot red"></span>
+                <span className="terminal-dot yellow"></span>
+                <span className="terminal-dot green"></span>
+              </div>
+              <span className="terminal-title">sendthelink://home</span>
+              <span className="w-10" aria-hidden="true"></span>
+            </div>
+            <div className="text-center px-6 py-8 md:py-10 lg:px-12 lg:py-12">
+              <h1 className="text-3xl md:text-5xl font-bold mb-3 tracking-tight text-[var(--foreground)]">
+                SendTheLink
+              </h1>
+              <p className="text-base md:text-lg mb-5" style={{ color: 'var(--text-secondary)' }}>
+                Share useful links with everyone. No login required.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowCreateForm((prev) => !prev)}
+                className="btn-glass inline-flex items-center gap-2"
+              >
+                <Plus size={18} /> {showCreateForm ? 'Hide Form' : 'Add Link'}
+              </button>
+            </div>
+          </div>
         </header>
 
         {/* Form - Glassmorphic Card */}
-        <div className="glass-card p-6 md:p-8 mb-12 fade-in-up" style={{ animationDelay: '0.1s' }}>
+        {showCreateForm && (
+        <div className="glass-card terminal-card overflow-hidden mb-12 fade-in-up" style={{ animationDelay: '0.1s' }}>
+          <div className="terminal-window-bar">
+            <div className="terminal-dots">
+              <span className="terminal-dot red"></span>
+              <span className="terminal-dot yellow"></span>
+              <span className="terminal-dot green"></span>
+            </div>
+            <span className="terminal-title">/usr/sendthelink/new-entry</span>
+            <span className="w-10" aria-hidden="true"></span>
+          </div>
+          <div className="p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -450,7 +482,7 @@ if (data.alreadyReported) {
                 id="anonymous"
                 checked={form.isAnonymous}
                 onChange={(e) => setForm({ ...form, isAnonymous: e.target.checked })}
-                className="w-5 h-5 accent-purple-500 cursor-pointer"
+                className="w-5 h-5 accent-emerald-400 cursor-pointer"
               />
               <label htmlFor="anonymous" className="cursor-pointer text-sm flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
                 <EyeOff size={16} /> Send Anonymously (hide my name)
@@ -466,7 +498,9 @@ if (data.alreadyReported) {
             </button>
 
           </form>
+          </div>
         </div>
+        )}
 
 {/* Search Bar */}
         <div className="mb-4 fade-in-up" style={{ animationDelay: '0.2s' }}>
@@ -504,7 +538,7 @@ if (data.alreadyReported) {
         </div>
 
         {/* Links Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {filteredLinks.length === 0 && searchQuery && (
             <div className="col-span-full text-center py-12" style={{ color: 'var(--text-muted)' }}>
               <p className="text-xl">No links found matching &quot;{searchQuery}&quot;</p>
@@ -516,9 +550,19 @@ if (data.alreadyReported) {
               key={item.id}
               href={`/link/${item.id}`}
               id={item.id}
-              className="glass-card p-5 fade-in-up block cursor-pointer hover:scale-[1.02] transition-transform duration-300"
+              className="glass-card terminal-card mini-terminal-card fade-in-up block cursor-pointer hover:translate-y-[-2px] transition-transform duration-300"
               style={{ animationDelay: `${0.3 + index * 0.05}s` }}
             >
+              <div className="terminal-window-bar">
+                <div className="terminal-dots">
+                  <span className="terminal-dot red"></span>
+                  <span className="terminal-dot yellow"></span>
+                  <span className="terminal-dot green"></span>
+                </div>
+                <span className="terminal-title">link://{item.id.slice(0, 6)}</span>
+                <span className="w-8" aria-hidden="true"></span>
+              </div>
+              <div className="p-4">
               <div className="mb-3">
                 {/* Top row: From + Verified badge */}
                 <div className="flex items-center gap-2 mb-2">
@@ -538,7 +582,7 @@ if (data.alreadyReported) {
                       e.stopPropagation();
                       handleShareDetails(item.id, item.metaTitle);
                     }}
-                    className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 transition font-semibold"
+                    className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-semibold"
                     title="Share this content"
                   >
                     <LinkIcon size={16} className="inline" /> <span className="hidden sm:inline">Share</span>
@@ -550,7 +594,7 @@ if (data.alreadyReported) {
                       e.stopPropagation();
                       handleCopyLink(item.url);
                     }}
-                    className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 transition font-semibold"
+                    className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-semibold"
                     title="Copy original link to clipboard"
                   >
                     <Copy size={16} className="inline" /> <span className="hidden sm:inline">Copy</span>
@@ -562,7 +606,7 @@ if (data.alreadyReported) {
                       e.stopPropagation();
                       openReportModal(item.id);
                     }}
-                    className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition font-semibold"
+                    className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg border border-red-500/35 bg-red-500/15 hover:bg-red-500/25 transition font-semibold"
                     title="Report inappropriate content"
                   >
                     <Flag size={16} className="inline" />
@@ -590,11 +634,9 @@ if (data.alreadyReported) {
               </p>
 
               {/* Link Preview Card */}
-              <div
-                className="flex items-center bg-white/10 rounded-xl overflow-hidden border border-white/20 hover:bg-white/20 transition group"
-              >
+              <div className="flex items-center rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--secondary)] transition group">
                 {/* Thumbnail */}
-                <div className="w-20 h-20 bg-white/5 flex-shrink-0 relative overflow-hidden">
+                <div className="w-20 h-20 bg-black/20 flex-shrink-0 relative overflow-hidden">
                   {isValidImageUrl(item.metaImage) ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
@@ -611,7 +653,7 @@ if (data.alreadyReported) {
 
                 {/* Link Info */}
                 <div className="p-3 overflow-hidden flex-1">
-                  <h3 className="font-bold text-sm truncate group-hover:text-blue-300 transition">
+                  <h3 className="font-bold text-sm truncate group-hover:text-[var(--foreground)] transition">
                     {item.metaTitle}
                   </h3>
                   <p className="text-xs truncate mt-1" style={{ color: 'var(--text-muted)' }}>
@@ -629,6 +671,8 @@ if (data.alreadyReported) {
 {/* View Details Hint */}
               <div className="mt-3 text-xs text-center flex items-center justify-center gap-1" style={{ color: 'var(--text-muted)' }}>
                 <ArrowUp size={14} /> Click card &quot;View Details&quot;
+              </div>
+
               </div>
 
             </Link>

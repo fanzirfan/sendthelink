@@ -207,11 +207,22 @@ export default function LinkDetailsPage() {
     if (loading) {
         return (
             <main className="min-h-screen px-4 md:px-10 py-8 md:py-10 flex items-center justify-center">
-                <div className="glass-card p-8 text-center">
+                <div className="glass-card terminal-card overflow-hidden text-center">
+                    <div className="terminal-window-bar">
+                        <div className="terminal-dots">
+                            <span className="terminal-dot red"></span>
+                            <span className="terminal-dot yellow"></span>
+                            <span className="terminal-dot green"></span>
+                        </div>
+                        <span className="terminal-title">sendthelink://detail/loading</span>
+                        <span className="w-8" aria-hidden="true"></span>
+                    </div>
+                    <div className="p-8">
                     <div className="text-4xl mb-4 text-[var(--foreground)]">
                         <LoaderCircle className="inline animate-spin" size={36} />
                     </div>
                     <p className="text-lg">Loading link details...</p>
+                    </div>
                 </div>
             </main>
         );
@@ -220,7 +231,17 @@ export default function LinkDetailsPage() {
     if (error) {
         return (
             <main className="min-h-screen px-4 md:px-10 py-8 md:py-10 flex items-center justify-center">
-                <div className="glass-card p-8 text-center max-w-md">
+                <div className="glass-card terminal-card overflow-hidden text-center max-w-md w-full">
+                    <div className="terminal-window-bar">
+                        <div className="terminal-dots">
+                            <span className="terminal-dot red"></span>
+                            <span className="terminal-dot yellow"></span>
+                            <span className="terminal-dot green"></span>
+                        </div>
+                        <span className="terminal-title">sendthelink://detail/error</span>
+                        <span className="w-8" aria-hidden="true"></span>
+                    </div>
+                    <div className="p-8">
                     <div className="text-5xl mb-4 text-[var(--foreground)]">
                         <Frown size={48} className="inline" />
                     </div>
@@ -229,6 +250,7 @@ export default function LinkDetailsPage() {
                     <Link href="/" className="btn-glass inline-block">
                         <ArrowLeft size={16} className="inline mr-2" /> Back to Home
                     </Link>
+                    </div>
                 </div>
             </main>
         );
@@ -252,7 +274,17 @@ export default function LinkDetailsPage() {
                 {/* Report Modal */}
                 {reportModal && (
                     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                        <div className="glass-card p-6 max-w-md w-full">
+                        <div className="glass-card terminal-card overflow-hidden max-w-md w-full">
+                            <div className="terminal-window-bar">
+                                <div className="terminal-dots">
+                                    <span className="terminal-dot red"></span>
+                                    <span className="terminal-dot yellow"></span>
+                                    <span className="terminal-dot green"></span>
+                                </div>
+                                <span className="terminal-title">sendthelink://detail/report</span>
+                                <span className="w-8" aria-hidden="true"></span>
+                            </div>
+                            <div className="p-6">
                             <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
                                 <Flag size={20} className="text-red-500" /> Report Inappropriate Content
                             </h3>
@@ -281,6 +313,7 @@ export default function LinkDetailsPage() {
                                     Cancel
                                 </button>
                             </div>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -294,7 +327,17 @@ export default function LinkDetailsPage() {
                 </Link>
 
                 {/* Main Content Card */}
-                <div className="glass-card p-6 md:p-8 fade-in-up" style={{ animationDelay: '0.1s' }}>
+                <div className="glass-card terminal-card fade-in-up overflow-hidden" style={{ animationDelay: '0.1s' }}>
+                    <div className="terminal-window-bar">
+                        <div className="terminal-dots">
+                            <span className="terminal-dot red"></span>
+                            <span className="terminal-dot yellow"></span>
+                            <span className="terminal-dot green"></span>
+                        </div>
+                        <span className="terminal-title">sendthelink://detail/{params.id || 'unknown'}</span>
+                        <span className="w-8" aria-hidden="true"></span>
+                    </div>
+                    <div className="p-6 md:p-8">
 
                     {/* Header */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -315,14 +358,14 @@ export default function LinkDetailsPage() {
                             {/* Share Button */}
                             <button
                                 onClick={handleSharePage}
-                                className="text-base px-4 py-2 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 transition font-bold"
+                                className="text-base px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-bold"
                                 title="Share this page"
                             >
                                 <LinkIcon size={16} className="inline mr-2" /> Share
                             </button>
                             <button
                                 onClick={() => handleCopyLink(linkData.url)}
-                                className="text-base px-4 py-2 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 transition font-bold"
+                                className="text-base px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-bold"
                                 title="Copy original link to clipboard"
                             >
                                 <Copy size={16} className="inline mr-2" /> Copy Link
@@ -375,11 +418,11 @@ export default function LinkDetailsPage() {
                             href={linkData.url}
                             target="_blank"
                             rel="noreferrer"
-                            className="block bg-white/10 rounded-xl overflow-hidden border border-white/20 hover:bg-white/20 transition group"
+                            className="block rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition group"
                         >
                             {/* Large Preview Image */}
                             {isValidImageUrl(linkData.metaImage) && (
-                                <div className="w-full h-48 md:h-64 relative overflow-hidden bg-white/5">
+                                <div className="w-full h-48 md:h-64 relative overflow-hidden bg-black/20">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
                                         src={linkData.metaImage}
@@ -392,7 +435,7 @@ export default function LinkDetailsPage() {
 
                             {/* Link Info */}
                             <div className="p-4">
-                                <h3 className="font-bold text-lg md:text-xl group-hover:text-blue-300 transition mb-2">
+                                <h3 className="font-bold text-lg md:text-xl group-hover:text-[var(--foreground)] transition mb-2">
                                     {linkData.metaTitle || linkData.url}
                                 </h3>
                                 <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
@@ -418,6 +461,7 @@ export default function LinkDetailsPage() {
                         <ExternalLink size={18} className="inline mr-2" /> Open Link
                     </a>
 
+                    </div>
                 </div>
 
                 {/* Footer */}
