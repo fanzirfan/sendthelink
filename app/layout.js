@@ -49,7 +49,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.png",
+        url: "/new-og.png",
         width: 1200,
         height: 630,
         alt: "SendTheLink - Free Link Sharing Platform"
@@ -62,7 +62,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "SendTheLink - Free Link Sharing",
     description: "Share useful links with everyone. Free resources for designers, developers & creators.",
-    images: ["/og-image.png"],
+    images: ["/new-og.png"],
     creator: "@sendthelink"
   },
 
@@ -76,8 +76,8 @@ export const metadata = {
 
   // Icons
   icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
+    icon: "/newfavico.png",
+    shortcut: "/newfavico.png",
     apple: "/apple-icon.png"
   },
 
