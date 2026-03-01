@@ -364,8 +364,8 @@ if (data.alreadyReported) {
         )}
 
         {/* Header */}
-        <header className="mb-10 fade-in-up px-2">
-          <div className="glass-card terminal-card max-w-3xl lg:max-w-5xl mx-auto overflow-hidden">
+        <header className="mb-10 fade-in-up">
+          <div className="glass-card terminal-card w-full overflow-hidden">
             <div className="terminal-window-bar">
               <div className="terminal-dots">
                 <span className="terminal-dot red"></span>
@@ -376,8 +376,8 @@ if (data.alreadyReported) {
               <span className="w-10" aria-hidden="true"></span>
             </div>
             <div className="text-center px-6 py-8 md:py-10 lg:px-12 lg:py-12">
-              <h1 className="text-3xl md:text-5xl font-bold mb-3 tracking-tight text-[var(--foreground)]">
-                SendTheLink
+              <h1 className="font-mono text-4xl md:text-5xl font-semibold mb-3 tracking-tight text-emerald-300 drop-shadow-[0_0_8px_rgba(74,222,128,0.22)]">
+                <span className="text-emerald-200/90">&gt;_</span>SendTheLink
               </h1>
               <p className="text-base md:text-lg mb-5" style={{ color: 'var(--text-secondary)' }}>
                 Share useful links with everyone. No login required.

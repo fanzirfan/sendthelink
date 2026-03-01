@@ -30,9 +30,10 @@
 - ✅ **Admin Control** - Manually verify/unverify users from admin dashboard
 
 ### 🎨 **Modern UI/UX**
-- Shadcn/UI inspired dark theme with purple accent
+- Terminal-inspired dark theme with subtle green grid background
+- Consistent terminal window chrome (red/yellow/green top bar) across key views
 - Responsive layout (mobile, tablet, desktop)
-- Dark mode optimized
+- Distinctive glowing terminal-style heading and mini terminal link cards
 - Real-time link preview with OG metadata
 - Anonymous posting option
 - Centered toast notifications (mobile-friendly)
@@ -55,7 +56,7 @@
 ### 🔗 **Link Details Page**
 - Dedicated page for each shared link (`/link/[id]`)
 - Large preview image
-- Verified badge display
+- Terminal-themed loading/error/modal states with window bar styling
 - Share, Copy, Report buttons
 - Full message and metadata
 
@@ -197,7 +198,7 @@ sendthelink/
 │   │   └── verify-captcha/ # reCAPTCHA verification
 │   ├── admin/            # Admin dashboard
 │   ├── link/[id]/        # Link details page
-│   ├── globals.css       # Global styles (Shadcn theme)
+│   ├── globals.css       # Global styles (terminal theme + grid motif)
 │   ├── layout.js         # Root layout
 │   └── page.js           # Homepage
 ├── lib/                   # Utilities
@@ -246,6 +247,13 @@ Contributions are welcome! Please:
 ## 📝 License
 
 This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file.
+
+---
+
+## 🖼️ Branding Assets
+
+- Open Graph image: `public/new-og.png`
+- Favicon: `public/newfavico.png`
 
 ---
 
