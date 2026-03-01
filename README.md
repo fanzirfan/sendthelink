@@ -1,5 +1,7 @@
 # 🔗 SendTheLink
 
+[![SendTheLink banner](public/new-og.png)](https://sendthelink.vercel.app)
+
 > **SendTheLink** is a free, secure, and modern link sharing platform with multi-layer security scanning, spam protection, and tag-based categorization. Share useful resources with anyone — no login required.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/fanzyb/sendthelink)
