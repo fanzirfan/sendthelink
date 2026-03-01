@@ -509,7 +509,7 @@ if (data.alreadyReported) {
             <input
               type="text"
               placeholder="Search links by sender, message, or URL..."
-              className="input-glass w-full pl-10"
+              className="input-glass w-full !pl-12"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
