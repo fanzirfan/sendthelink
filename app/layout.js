@@ -35,9 +35,9 @@ export const metadata = {
     "no login sharing",
     "resource sharing platform"
   ],
-  authors: [{ name: "SendTheLink" }],
-  creator: "SendTheLink",
-  publisher: "SendTheLink",
+  authors: [{ name: "Nobody Space" }],
+  creator: "Nobody Space",
+  publisher: "Nobody Space",
 
   // Open Graph (Facebook, LinkedIn)
   openGraph: {
@@ -124,11 +124,9 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Preconnect to critical third-party origins for faster loading */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://firestore.googleapis.com" />
         <link rel="preconnect" href="https://www.google.com" />
         <link rel="preconnect" href="https://www.gstatic.com" />
@@ -141,9 +139,14 @@ export default function RootLayout({ children }) {
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="format-detection" content="telephone=no" />
       </head>
-      <body
-        className={`${jetbrainsMono.variable} antialiased`}
-      >
+      <body className={`${jetbrainsMono.variable} antialiased`} suppressHydrationWarning>
+        <a
+          href="#content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[10001] focus:rounded focus:bg-[var(--card)] focus:px-4 focus:py-2 focus:text-sm"
+        >
+          Skip to content
+        </a>
+
         {/* Support Palestine Banner */}
         <a
           className="support-palestine"
@@ -185,7 +188,7 @@ export default function RootLayout({ children }) {
         {/* End of Donate Button */}
 
 
-        {children}
+        <div id="content">{children}</div>
         <Analytics />
       </body>
     </html>

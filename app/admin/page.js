@@ -2,7 +2,7 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Gamepad2, Palette, Laptop, BookOpen, Hammer, Bot, Music, Film, PenTool, Smartphone, Monitor, Box, Shield, Eye, RefreshCw, Image as ImageIcon, Trash, Tag, Search as SearchIcon, Clock, AlertTriangle, CheckCircle, XCircle, Save, LogOut, Filter, MoreVertical, Edit } from "lucide-react";
+import { Gamepad2, Palette, Laptop, BookOpen, Hammer, Bot, Music, Film, PenTool, Smartphone, Monitor, Box, Shield, Eye, RefreshCw, Image as ImageIcon, Trash, Tag, Search as SearchIcon, Clock, AlertTriangle, CheckCircle, XCircle, Save, LogOut, Filter, Edit } from "lucide-react";
 
 // Available tags for categorization (must match page.js)
 const AVAILABLE_TAGS = [
@@ -253,7 +253,7 @@ const handleLogout = () => {
 // Login Screen
     if (!authenticated) {
         return (
-            <main className="min-h-screen flex items-center justify-center p-4">
+            <main className="min-h-[100dvh] flex items-center justify-center p-4">
                 <div className="glass-card p-8 max-w-md w-full">
                     <h1 className="text-3xl font-bold mb-6 text-center flex items-center justify-center gap-2">
                         <Shield size={32} /> Admin Login
@@ -282,7 +282,7 @@ const handleLogout = () => {
 
     // Admin Dashboard
     return (
-        <main className="min-h-screen p-4 md:p-8">
+        <main className="min-h-[100dvh] p-4 md:p-8">
             <div className="max-w-7xl mx-auto">
 
                 {/* Header */}
@@ -412,9 +412,10 @@ const handleLogout = () => {
 
 {/* Search */}
                         <div className="relative">
-                            <SearchIcon size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <SearchIcon size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true" />
                             <input
                                 type="text"
+                                aria-label="Search links"
                                 placeholder="Search links..."
                                 className="input-glass w-full pl-10"
                                 value={searchQuery}
@@ -739,7 +740,7 @@ link.tags.slice(0, 2).map(tagId => {
                                                                 ) : null;
                                                             })
                                                         ) : (
-                                                            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>—</span>
+                                                            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>-</span>
                                                         )}
                                                         {link.tags && link.tags.length > 2 && (
                                                             <span className="text-xs" style={{ color: 'var(--text-muted)' }}>+{link.tags.length - 2}</span>

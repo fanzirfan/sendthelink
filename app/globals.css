@@ -43,6 +43,10 @@
   --border: #2b3a34;
   --input: #141d1a;
   --ring: #65f7b2;
+
+  /* Body text stack: sans for long-form reading, mono stays for UI chrome */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --radius-xl: 0.75rem;
 }
 
 @theme inline {
@@ -71,50 +75,61 @@ body {
   margin-top: 35px;
   background-color: var(--background);
   background-image:
-    linear-gradient(to right, rgba(101, 247, 178, 0.035) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(101, 247, 178, 0.035) 1px, transparent 1px),
-    linear-gradient(to right, rgba(101, 247, 178, 0.07) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(101, 247, 178, 0.07) 1px, transparent 1px),
-    radial-gradient(120% 90% at 15% 0%, rgba(101, 247, 178, 0.045), transparent 58%);
-  background-size: 26px 26px, 26px 26px, 104px 104px, 104px 104px, auto;
-  background-repeat: repeat, repeat, repeat, repeat, no-repeat;
+    linear-gradient(to right, rgba(101, 247, 178, 0.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(101, 247, 178, 0.028) 1px, transparent 1px),
+    radial-gradient(120% 90% at 15% 0%, rgba(101, 247, 178, 0.035), transparent 58%);
+  background-size: 28px 28px, 28px 28px, auto;
+  background-repeat: repeat, repeat, no-repeat;
   color: var(--foreground);
   font-family: var(--font-mono), 'JetBrains Mono', ui-monospace, monospace;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Tailwind v4 layer order: theme, base, components, utilities.
+   Component classes live here so utility classes (pl-12, text-sm, ...)
+   always win without !important. */
+@layer components {
+/* Long-form reading text; UI chrome and data stay monospace */
+.font-body {
+  font-family: var(--font-sans);
+}
+
 /* Card Component */
 .glass-card {
   background-color: var(--card);
-  border-radius: 0.75rem;
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border);
-  box-shadow: 0 0 0 1px rgba(101, 247, 178, 0.08), 0 12px 28px rgba(0, 0, 0, 0.35);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
 .glass-card:hover {
+  border-color: #33453d;
   transform: translateY(-1px);
-  box-shadow: 0 0 0 1px rgba(101, 247, 178, 0.15), 0 14px 30px rgba(0, 0, 0, 0.38);
 }
 
 /* Primary Button */
 .btn-glass {
-  background-color: rgba(101, 247, 178, 0.15);
-  border: 1px solid rgba(101, 247, 178, 0.4);
+  background-color: var(--primary);
+  border: 1px solid var(--primary);
   border-radius: 0.5rem;
   padding: 12px 24px;
   font-weight: 600;
-  color: var(--foreground);
+  color: var(--primary-foreground);
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
 .btn-glass:hover {
-  background-color: rgba(101, 247, 178, 0.24);
+  background-color: #7affc2;
+  border-color: #7affc2;
   transform: translateY(-1px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.28);
 }
 
 .btn-glass:disabled {
@@ -159,26 +174,6 @@ body {
 .fade-in-up {
   animation: fadeInUp 0.4s ease forwards;
 }
-
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-.shimmer {
-  background: linear-gradient(90deg,
-      oklch(0.985 0 0 / 0%) 0%,
-      oklch(0.985 0 0 / 10%) 50%,
-      oklch(0.985 0 0 / 0%) 100%);
-  background-size: 1000px 100%;
-  animation: shimmer 2s infinite;
-}
-
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;
@@ -249,7 +244,7 @@ body {
   text-decoration: none;
   font-weight: 600;
   font-size: 14px;
-  box-shadow: 0 6px 18px rgba(101, 247, 178, 0.28);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   transition: all 0.2s ease;
   will-change: transform, box-shadow;
 }
@@ -257,13 +252,11 @@ body {
 .donate-button:hover {
   background: #7affc2;
   transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(101, 247, 178, 0.34);
   text-decoration: none;
 }
 
 .donate-button:active {
   transform: translateY(0) scale(0.98);
-  box-shadow: 0 3px 10px rgba(101, 247, 178, 0.22);
 }
 
 .donate-button__icon {
@@ -277,17 +270,6 @@ body {
   font-family: var(--font-mono), 'JetBrains Mono', monospace;
 }
 
-@keyframes heart-pulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.1);
-  }
-}
 
 /* Tag Chip - Form Selector */
 .tag-chip {
@@ -312,7 +294,7 @@ body {
   background: rgba(101, 247, 178, 0.2);
   border-color: rgba(101, 247, 178, 0.4);
   color: var(--foreground);
-  box-shadow: 0 2px 8px rgba(101, 247, 178, 0.18);
+  box-shadow: none;
 }
 
 /* Tag Filter - Filter Buttons */
@@ -350,7 +332,7 @@ body {
   color: var(--muted-foreground);
 }
 
-/* Verified Badge - Social Media Style (Twitter/Meta Blue) */
+/* Verified Badge - emerald accent, matches primary */
 .verified-badge {
   display: inline-flex;
   align-items: center;
@@ -364,7 +346,6 @@ body {
   color: #9dffcb;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  box-shadow: 0 2px 8px rgba(101, 247, 178, 0.2);
 }
 
 /* Verified Icon Only - Like Twitter Blue Check */
@@ -378,7 +359,6 @@ body {
   background: rgba(101, 247, 178, 0.2);
   color: #9dffcb;
   font-size: 11px;
-  box-shadow: 0 2px 6px rgba(101, 247, 178, 0.2);
 }
 
 .terminal-window-bar {
@@ -420,9 +400,6 @@ body {
   font-size: 11px;
   letter-spacing: 0.04em;
 }
-
-.mini-terminal-card {
-  overflow: hidden;
 }
 
 /* ================================================
@@ -500,11 +477,29 @@ html {
 /* Mobile-specific optimizations */
 @media (max-width: 768px) {
 
-  /* Larger touch targets on mobile */
-  .tag-chip,
-  .tag-filter {
-    padding: 8px 12px;
-    font-size: 12px;
+  @layer components {
+
+    /* Larger touch targets on mobile */
+    .tag-chip,
+    .tag-filter {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    /* Reduce complexity of glass effects on mobile */
+    .glass-card {
+      box-shadow: none;
+    }
+
+    .glass-card:hover {
+      transform: none;
+      border-color: var(--border);
+    }
+
+    /* Terminal chrome cards manage their own inner spacing */
+    .glass-card.terminal-card {
+      padding: 0;
+    }
   }
 
   /* Optimize scrolling performance */
@@ -512,22 +507,11 @@ html {
     -webkit-overflow-scrolling: touch;
     overflow-scrolling: touch;
     background-image:
-      linear-gradient(to right, rgba(101, 247, 178, 0.035) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(101, 247, 178, 0.035) 1px, transparent 1px),
-      radial-gradient(120% 90% at 15% 0%, rgba(101, 247, 178, 0.035), transparent 60%);
-    background-size: 22px 22px, 22px 22px, auto;
+      linear-gradient(to right, rgba(101, 247, 178, 0.028) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(101, 247, 178, 0.028) 1px, transparent 1px),
+      radial-gradient(120% 90% at 15% 0%, rgba(101, 247, 178, 0.03), transparent 60%);
+    background-size: 24px 24px, 24px 24px, auto;
     background-repeat: repeat, repeat, no-repeat;
-  }
-
-  /* Reduce complexity of glass effects on mobile */
-  .glass-card {
-    box-shadow: 0 2px 8px oklch(0 0 0 / 15%);
-  }
-
-  .glass-card:hover {
-    transform: none;
-    /* Disable hover transform on mobile */
-    box-shadow: 0 2px 8px oklch(0 0 0 / 15%);
   }
 
   /* Simplify animations on mobile for better performance */
@@ -547,45 +531,25 @@ html {
   img {
     image-rendering: optimizeSpeed;
   }
-
-  /* Responsive font sizes for mobile */
-  h1 {
-    font-size: 1.75rem !important;
-    line-height: 1.2;
-  }
-
-  /* Better spacing on mobile */
-  .glass-card {
-    padding: 16px;
-  }
-
-  .glass-card.terminal-card {
-    padding: 0;
-  }
 }
 
 /* Small mobile devices */
 @media (max-width: 375px) {
 
-  .tag-chip,
-  .tag-filter {
-    font-size: 11px;
-    padding: 8px 10px;
+  @layer components {
+
+    .tag-chip,
+    .tag-filter {
+      font-size: 11px;
+      padding: 8px 10px;
+    }
+
+    .btn-glass {
+      padding: 12px 16px;
+      font-size: 14px;
+    }
   }
 
-  .btn-glass {
-    padding: 12px 16px;
-    font-size: 14px;
-  }
-
-  /* Even more compact spacing */
-  .glass-card {
-    padding: 12px;
-  }
-
-  .glass-card.terminal-card {
-    padding: 0;
-  }
 }
 
 /* High DPI screens - optimize for retina */

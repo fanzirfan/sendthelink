@@ -4,40 +4,28 @@ export const metadata = {
 };
 
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default function AnalyticsPolicy() {
     return (
-        <div className="min-h-screen py-10 px-4 flex justify-center">
-            <div className="w-full max-w-3xl glass-card terminal-card overflow-hidden animate-slide-in">
-                <div className="terminal-window-bar">
-                    <div className="terminal-dots">
-                        <span className="terminal-dot red"></span>
-                        <span className="terminal-dot yellow"></span>
-                        <span className="terminal-dot green"></span>
-                    </div>
-                    <span className="terminal-title">sendthelink://analytics-policy</span>
-                    <span className="w-8" aria-hidden="true"></span>
-                </div>
+        <div className="min-h-[100dvh] py-10 px-4 flex justify-center">
+            <div className="w-full max-w-3xl glass-card overflow-hidden fade-in-up">
                 <div className="p-8">
-
                 {/* Header */}
                 <div className="mb-8 border-b border-[var(--border)] pb-6">
                     <Link
                         href="/"
-                        className="inline-flex items-center text-sm mb-4 text-[var(--muted-foreground)] hover:text-[var(--primary)] transition-colors"
+                        className="inline-flex items-center gap-2 text-sm mb-4 font-body text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors"
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-                            <path d="M19 12H5" />
-                            <path d="M12 19l-7-7 7-7" />
-                        </svg>
-                        Back to Home
+                        <ArrowLeft size={16} aria-hidden="true" />
+                        Back to all links
                     </Link>
-                    <h1 className="text-3xl font-bold mb-2">Analytics Policy</h1>
-                    <p className="text-[var(--muted-foreground)]">Effective Date: January 10, 2026</p>
+                    <h1 className="text-3xl font-bold mb-2">Analytics policy</h1>
+                    <p className="text-sm font-body text-[var(--text-secondary)]">Effective date: January 10, 2026</p>
                 </div>
 
                 {/* Content */}
-                <div className="prose prose-invert prose-p:text-[var(--muted-foreground)] prose-headings:text-[var(--foreground)] max-w-none space-y-6">
+                <div className="space-y-8 font-body text-[var(--text-secondary)] leading-relaxed">
 
                     <section>
                         <h2 className="text-xl font-semibold mb-3 text-[var(--foreground)]">Introduction</h2>
@@ -55,7 +43,7 @@ export default function AnalyticsPolicy() {
                             Vercel Analytics collects anonymous data about visitors.
                             We do <strong>not</strong> collect any Personally Identifiable Information (PII) such as:
                         </p>
-                        <ul className="list-disc pl-5 space-y-1 mt-2 text-[var(--muted-foreground)]">
+                        <ul className="list-disc pl-5 space-y-1 mt-2">
                             <li>Names</li>
                             <li>Email addresses</li>
                             <li>IP addresses</li>
@@ -64,7 +52,7 @@ export default function AnalyticsPolicy() {
                         <p className="mt-3 leading-relaxed">
                             Instead, we track aggregated metrics such as:
                         </p>
-                        <ul className="list-disc pl-5 space-y-1 mt-2 text-[var(--muted-foreground)]">
+                        <ul className="list-disc pl-5 space-y-1 mt-2">
                             <li>Page views and unique visitors</li>
                             <li>Referrer sources (where you came from)</li>
                             <li>Device types and operating systems</li>
@@ -77,7 +65,7 @@ export default function AnalyticsPolicy() {
                         <p className="leading-relaxed">
                             Vercel Analytics is designed to be privacy-friendly:
                         </p>
-                        <ul className="list-disc pl-5 space-y-1 mt-2 text-[var(--muted-foreground)]">
+                        <ul className="list-disc pl-5 space-y-1 mt-2">
                             <li><strong>No Cookies:</strong> It does not use cookies to track visitors across sessions or other websites.</li>
                             <li><strong>GDPR Compliant:</strong> Since no PII is collected, it is compliant with GDPR, CCPA, and PECR without requiring a cookie consent banner.</li>
                             <li><strong>Data Ownership:</strong> Usage data belongs to us and is not shared with third-party advertisers.</li>
@@ -89,7 +77,7 @@ export default function AnalyticsPolicy() {
                         <p className="leading-relaxed">
                             We use this data solely to:
                         </p>
-                        <ul className="list-disc pl-5 space-y-1 mt-2 text-[var(--muted-foreground)]">
+                        <ul className="list-disc pl-5 space-y-1 mt-2">
                             <li>Monitor website performance and speed.</li>
                             <li>Identify broken links or popular pages.</li>
                             <li>Understand our audience demographics (e.g., country, device) to optimize the design.</li>
@@ -99,13 +87,13 @@ export default function AnalyticsPolicy() {
                     <section>
                         <h2 className="text-xl font-semibold mb-3 text-[var(--foreground)]">Opt-Out</h2>
                         <p className="leading-relaxed">
-                            Since Vercel Analytics does not track individuals or use cookies for tracking, typical &quot;Do Not Track&quot; signals are respected where applicable by the platform standard, but there is no specific opt-out button needed as no personal data is at risk.
+                            Since Vercel Analytics does not track individuals or use cookies, there is no opt-out button to press: no personal data is collected, so there is nothing to opt out of. Platform-level &quot;Do Not Track&quot; signals are respected where applicable.
                         </p>
                     </section>
 
                     <div className="pt-8 mt-8 border-t border-[var(--border)]">
-                        <p className="text-sm text-[var(--muted-foreground)]">
-                            If you have any questions about this policy, please contact us at <a href="mailto:dmca@manji.eu.org" className="text-[var(--primary)] hover:underline">dmca@manji.eu.org</a>.
+                        <p className="text-sm font-body">
+                            Questions about this policy? Contact <a href="mailto:dmca@manji.eu.org" className="text-[var(--primary)] hover:underline">dmca@manji.eu.org</a>.
                         </p>
                     </div>
 

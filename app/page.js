@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback, memo } from "react";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../lib/firebase";
 import Link from "next/link";
-import { Gamepad2, Palette, Laptop, BookOpen, Hammer, Bot, Music, Film, PenTool, Smartphone, Monitor, Box, Search, Copy, Flag, RefreshCw, Tag, Lock, EyeOff, Rocket, ArrowUp, Shield, Mail, SearchCheck, Link as LinkIcon, FileSpreadsheet, Coffee, Plus } from "lucide-react";
+import { Gamepad2, Palette, Laptop, BookOpen, Hammer, Bot, Music, Film, PenTool, Smartphone, Monitor, Box, Search, Copy, Flag, RefreshCw, Tag, Lock, EyeOff, Shield, Mail, SearchCheck, Link as LinkIcon, FileSpreadsheet, Coffee, Plus } from "lucide-react";
 
 // Helper function to validate image URLs
 const isValidImageUrl = (url) => {
@@ -312,18 +312,26 @@ if (data.alreadyReported) {
     setReportReason("");
   };
 
+  // Close the report dialog with Escape
+  useEffect(() => {
+    if (!reportModal) return;
+    const onKey = (e) => { if (e.key === 'Escape') setReportModal(null); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [reportModal]);
+
   return (
-    <main className="min-h-screen px-4 md:px-10 py-8 md:py-10 text-[var(--foreground)]">
+    <main className="min-h-[100dvh] px-4 md:px-10 py-8 md:py-10 text-[var(--foreground)]">
       <div className="max-w-6xl mx-auto">
 
         {/* Toast Notification */}
         {toast && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-            <div className={`glass-card p-6 md:p-8 w-full max-w-sm md:max-w-lg animate-toast-popup pointer-events-auto ${toast.type === 'error' ? 'border-red-500' :
-              toast.type === 'success' ? 'border-green-500' :
-                toast.type === 'warning' ? 'border-yellow-500' :
-                  'border-blue-500'
-              } border-l-4 text-center shadow-2xl`}>
+            <div className={`glass-card p-5 w-full max-w-sm md:max-w-lg animate-toast-popup pointer-events-auto border-l-4 ${toast.type === 'error' ? 'border-l-red-400' :
+              toast.type === 'success' ? 'border-l-[var(--primary)]' :
+                toast.type === 'warning' ? 'border-l-amber-400' :
+                  'border-l-[var(--border)]'
+              } text-center`}>
               <p className="text-base md:text-lg font-medium whitespace-pre-line">{toast.message}</p>
             </div>
           </div>
@@ -331,30 +339,40 @@ if (data.alreadyReported) {
 
         {/* Report Modal */}
         {reportModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-<div className="glass-card p-6 max-w-md w-full">
-              <h3 className="text-xl font-bold mb-4 flex items-center gap-2"><Flag size={20} className="text-red-500" /> Report Inappropriate Content</h3>
-              <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                Please tell us why you&apos;re reporting this link:
-              </p>
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+            <div
+              className="glass-card p-6 max-w-md w-full"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="report-title"
+            >
+              <h3 id="report-title" className="text-xl font-bold mb-4 flex items-center gap-2">
+                <Flag size={20} className="text-red-400" /> Report link
+              </h3>
+              <label htmlFor="report-reason" className="block text-sm mb-1 font-body" style={{ color: 'var(--text-secondary)' }}>
+                Reason
+              </label>
               <textarea
+                id="report-reason"
                 value={reportReason}
                 onChange={(e) => setReportReason(e.target.value)}
-                placeholder="e.g., spam, inappropriate content, scam..."
+                placeholder="Spam, scam, malware, copyright..."
                 className="input-glass w-full resize-none mb-4"
                 rows="4"
                 autoFocus
               />
               <div className="flex gap-3">
                 <button
+                  type="button"
                   onClick={submitReport}
                   className="btn-glass flex-1"
                 >
-                  Submit Report
+                  Submit report
                 </button>
                 <button
+                  type="button"
                   onClick={() => setReportModal(null)}
-                  className="px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 transition font-semibold"
+                  className="px-6 py-3 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-semibold"
                 >
                   Cancel
                 </button>
@@ -372,14 +390,16 @@ if (data.alreadyReported) {
                 <span className="terminal-dot yellow"></span>
                 <span className="terminal-dot green"></span>
               </div>
-              <span className="terminal-title">sendthelink://home</span>
-              <span className="w-10" aria-hidden="true"></span>
+              <span className="terminal-title">shared-links/</span>
             </div>
             <div className="text-center px-6 py-8 md:py-10 lg:px-12 lg:py-12">
-              <h1 className="font-mono text-4xl md:text-5xl font-semibold mb-3 tracking-tight text-emerald-300 drop-shadow-[0_0_8px_rgba(74,222,128,0.22)]">
-                <span className="text-emerald-200/90">&gt;_</span>SendTheLink
+              <h1 className="text-4xl md:text-5xl font-semibold mb-2 tracking-tight text-[var(--foreground)]">
+                <span className="text-[var(--primary)]">&gt;_</span>SendTheLink
               </h1>
-              <p className="text-base md:text-lg mb-5" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm md:text-base tracking-wide mb-3 font-body" style={{ color: 'var(--text-secondary)' }}>
+                by Nobody Space
+              </p>
+              <p className="text-base md:text-lg mb-5 font-body" style={{ color: 'var(--text-secondary)' }}>
                 Share useful links with everyone. No login required.
               </p>
               <button
@@ -395,53 +415,66 @@ if (data.alreadyReported) {
 
         {/* Form - Glassmorphic Card */}
         {showCreateForm && (
-        <div className="glass-card terminal-card overflow-hidden mb-12 fade-in-up" style={{ animationDelay: '0.1s' }}>
-          <div className="terminal-window-bar">
-            <div className="terminal-dots">
-              <span className="terminal-dot red"></span>
-              <span className="terminal-dot yellow"></span>
-              <span className="terminal-dot green"></span>
-            </div>
-            <span className="terminal-title">/usr/sendthelink/new-entry</span>
-            <span className="w-10" aria-hidden="true"></span>
-          </div>
+        <div className="glass-card overflow-hidden mb-12 fade-in-up" style={{ animationDelay: '0.1s' }}>
           <div className="p-6 md:p-8">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <h2 className="text-xl font-semibold mb-1">Share a link</h2>
+          <p className="text-sm mb-6 font-body" style={{ color: 'var(--text-secondary)' }}>
+            Scanned for malware before it appears.
+          </p>
+          <form onSubmit={handleSubmit} className="space-y-5">
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input
-                required
-                type="text"
-                placeholder="From: (e.g., John Doe)"
-                className="input-glass w-full"
-                value={form.from}
-                onChange={(e) => setForm({ ...form, from: e.target.value })}
-                disabled={form.isAnonymous}
-              />
-              <input
-                required
-                type="url"
-                placeholder="Paste Link (https://...)"
-                className="input-glass w-full"
-                value={form.url}
-                onChange={(e) => setForm({ ...form, url: e.target.value })}
-              />
+              <div>
+                <label htmlFor="from" className="block text-sm mb-2 font-body" style={{ color: 'var(--text-secondary)' }}>
+                  From
+                </label>
+                <input
+                  id="from"
+                  required
+                  type="text"
+                  placeholder="Name or handle"
+                  className="input-glass w-full"
+                  value={form.from}
+                  onChange={(e) => setForm({ ...form, from: e.target.value })}
+                  disabled={form.isAnonymous}
+                />
+              </div>
+              <div>
+                <label htmlFor="url" className="block text-sm mb-2 font-body" style={{ color: 'var(--text-secondary)' }}>
+                  Link
+                </label>
+                <input
+                  id="url"
+                  required
+                  type="url"
+                  placeholder="https://..."
+                  className="input-glass w-full"
+                  value={form.url}
+                  onChange={(e) => setForm({ ...form, url: e.target.value })}
+                />
+              </div>
             </div>
 
-            <textarea
-              required
-              rows="3"
-              placeholder="Your message (e.g., This is a great free 3D asset!)"
-              className="input-glass w-full resize-none"
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-            />
+            <div>
+              <label htmlFor="message" className="block text-sm mb-2 font-body" style={{ color: 'var(--text-secondary)' }}>
+                Message
+              </label>
+              <textarea
+                id="message"
+                required
+                rows="3"
+                placeholder="Why is it worth sharing?"
+                className="input-glass w-full resize-none"
+                value={form.message}
+                onChange={(e) => setForm({ ...form, message: e.target.value })}
+              />
+            </div>
 
 {/* Tag Selector */}
             <div>
-              <label className="block text-sm mb-2 flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
-                <Tag size={16} /> Select Tags (min 1 required)
-              </label>
+              <span className="block text-sm mb-2 flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
+                <Tag size={16} aria-hidden="true" /> Tags (at least one)
+              </span>
               <div className="flex flex-wrap gap-2">
                 {AVAILABLE_TAGS.map((tag) => (
                   <button
@@ -455,24 +488,32 @@ if (data.alreadyReported) {
                     }}
                     className={`tag-chip ${form.tags.includes(tag.id) ? 'active' : ''}`}
                   >
-                    <tag.icon size={16} className="inline mr-1" /> {tag.label}
+                    <tag.icon size={16} className="inline mr-1" aria-hidden="true" /> {tag.label}
                   </button>
                 ))}
               </div>
             </div>
 
-{/* Verified Password (Optional) */}
+            {/* Verification Password (optional) */}
             <div>
+              <label htmlFor="verifyPassword" className="block text-sm mb-2 font-body" style={{ color: 'var(--text-secondary)' }}>
+                Verification password
+              </label>
               <div className="relative">
-                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <Lock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true" />
                 <input
+                  id="verifyPassword"
                   type="password"
-                  placeholder="Verification Password (optional - for verified badge)"
+                  placeholder="Optional"
+                  aria-describedby="verify-hint"
                   className="input-glass w-full pl-10"
                   value={form.verifyPassword}
                   onChange={(e) => setForm({ ...form, verifyPassword: e.target.value })}
                 />
               </div>
+              <p id="verify-hint" className="text-xs mt-1 font-body" style={{ color: 'var(--text-muted)' }}>
+                Adds the verified badge to your link.
+              </p>
             </div>
 
 {/* Anonymous Checkbox */}
@@ -482,19 +523,19 @@ if (data.alreadyReported) {
                 id="anonymous"
                 checked={form.isAnonymous}
                 onChange={(e) => setForm({ ...form, isAnonymous: e.target.checked })}
-                className="w-5 h-5 accent-emerald-400 cursor-pointer"
+                className="w-5 h-5 cursor-pointer"
               />
-              <label htmlFor="anonymous" className="cursor-pointer text-sm flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
-                <EyeOff size={16} /> Send Anonymously (hide my name)
+              <label htmlFor="anonymous" className="cursor-pointer text-sm flex items-center gap-2 font-body" style={{ color: 'var(--text-secondary)' }}>
+                <EyeOff size={16} aria-hidden="true" /> Send anonymously
               </label>
             </div>
 
-<button
+            <button
               disabled={loading}
               type="submit"
-              className="btn-glass w-full text-lg font-bold flex items-center justify-center gap-2"
+              className="btn-glass w-full text-lg font-bold"
             >
-              {loading ? <RefreshCw size={20} className="animate-spin" /> : <><span>Send Link</span><Rocket size={20} /></>}
+              {loading ? <RefreshCw size={20} className="animate-spin inline" /> : "Send link"}
             </button>
 
           </form>
@@ -505,11 +546,12 @@ if (data.alreadyReported) {
 {/* Search Bar */}
         <div className="mb-4 fade-in-up" style={{ animationDelay: '0.2s' }}>
           <div className="relative">
-            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" aria-hidden="true" />
             <input
               type="text"
-              placeholder="Search links by sender, message, or URL..."
-              className="input-glass w-full !pl-12"
+              aria-label="Search links"
+              placeholder="Search by sender, message, or URL..."
+              className="input-glass w-full pl-10"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -538,10 +580,40 @@ if (data.alreadyReported) {
         </div>
 
         {/* Links Grid */}
+        {links.length === 0 ? (
+          <div className="glass-card p-10 text-center fade-in-up" aria-live="polite">
+            <p className="text-lg mb-1.5">No links yet</p>
+            <p className="text-sm font-body mb-6" style={{ color: 'var(--text-secondary)' }}>
+              Nothing has been shared yet. Add the first link.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowCreateForm(true)}
+              className="btn-glass inline-flex items-center gap-2"
+            >
+              <Plus size={18} aria-hidden="true" /> Add link
+            </button>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-          {filteredLinks.length === 0 && searchQuery && (
-            <div className="col-span-full text-center py-12" style={{ color: 'var(--text-muted)' }}>
-              <p className="text-xl">No links found matching &quot;{searchQuery}&quot;</p>
+          {filteredLinks.length === 0 && (
+            <div
+              className="col-span-full glass-card p-8 text-center"
+              style={{ color: 'var(--text-muted)' }}
+              aria-live="polite"
+            >
+              <p className="text-base">
+                {searchQuery
+                  ? `No links match "${searchQuery}"`
+                  : 'No links with this tag yet'}
+              </p>
+              <button
+                type="button"
+                onClick={() => { setSearchQuery(''); setActiveTagFilter(null); }}
+                className="tag-filter mt-3"
+              >
+                Clear filters
+              </button>
             </div>
           )}
 
@@ -550,78 +622,66 @@ if (data.alreadyReported) {
               key={item.id}
               href={`/link/${item.id}`}
               id={item.id}
-              className="glass-card terminal-card mini-terminal-card fade-in-up block cursor-pointer hover:translate-y-[-2px] transition-transform duration-300"
+              className="glass-card fade-in-up block cursor-pointer"
               style={{ animationDelay: `${0.3 + index * 0.05}s` }}
             >
-              <div className="terminal-window-bar">
-                <div className="terminal-dots">
-                  <span className="terminal-dot red"></span>
-                  <span className="terminal-dot yellow"></span>
-                  <span className="terminal-dot green"></span>
-                </div>
-                <span className="terminal-title">link://{item.id.slice(0, 6)}</span>
-                <span className="w-8" aria-hidden="true"></span>
+              <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-[var(--border)]">
+                <h2 className="text-sm font-semibold truncate">
+                  {item.metaTitle || item.url}
+                </h2>
+                <span className="text-xs shrink-0" style={{ color: 'var(--text-muted)' }}>
+                  {item.from || 'Anonymous'}
+                  {item.isVerified && <span className="verified-icon ml-2" title="Verified">✓</span>}
+                </span>
               </div>
               <div className="p-4">
               <div className="mb-3">
-                {/* Top row: From + Verified badge */}
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-                    From: <span style={{ color: 'var(--text-secondary)' }}>{item.from || "Anonymous"}</span>
-                  </span>
-                  {item.isVerified && (
-                    <span className="verified-icon" title="Verified">✓</span>
-                  )}
-                </div>
-                {/* Buttons row */}
-                <div className="flex gap-2">
-{/* Share Details Button */}
+                <div className="flex flex-wrap gap-2">
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       handleShareDetails(item.id, item.metaTitle);
                     }}
-                    className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-semibold"
-                    title="Share this content"
+                    className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-semibold inline-flex items-center gap-1.5"
                   >
-                    <LinkIcon size={16} className="inline" /> <span className="hidden sm:inline">Share</span>
+                    <LinkIcon size={14} aria-hidden="true" /> Share
                   </button>
-                  {/* Copy Link Button */}
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       handleCopyLink(item.url);
                     }}
-                    className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-semibold"
-                    title="Copy original link to clipboard"
+                    className="text-xs px-3 py-1.5 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-semibold inline-flex items-center gap-1.5"
                   >
-                    <Copy size={16} className="inline" /> <span className="hidden sm:inline">Copy</span>
+                    <Copy size={14} aria-hidden="true" /> Copy
                   </button>
-                  {/* Report Button */}
                   <button
+                    type="button"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       openReportModal(item.id);
                     }}
-                    className="text-xs md:text-sm px-2 md:px-3 py-1.5 md:py-2 rounded-lg border border-red-500/35 bg-red-500/15 hover:bg-red-500/25 transition font-semibold"
-                    title="Report inappropriate content"
+                    className="text-xs px-3 py-1.5 rounded-lg border border-red-500/35 bg-red-500/15 hover:bg-red-500/25 transition font-semibold inline-flex items-center gap-1.5"
+                    title="Report this link"
                   >
-                    <Flag size={16} className="inline" />
+                    <Flag size={14} aria-hidden="true" /> Report
                   </button>
                 </div>
               </div>
 
-{/* Tags */}
+              {/* Tags */}
               {item.tags && item.tags.length > 0 && (
                 <div className="flex flex-wrap gap-1 mb-3">
                   {item.tags.map(tagId => {
                     const tag = AVAILABLE_TAGS.find(t => t.id === tagId);
                     return tag ? (
                       <span key={tagId} className="tag-display flex items-center gap-1">
-                        <tag.icon size={12} /> {tag.label}
+                        <tag.icon size={12} aria-hidden="true" /> {tag.label}
                       </span>
                     ) : null;
                   })}
@@ -629,32 +689,32 @@ if (data.alreadyReported) {
               )}
 
               {/* Message */}
-              <p className="text-base mb-4 leading-relaxed" style={{ color: 'var(--text-primary)' }}>
+              <p className="text-base mb-4 leading-relaxed line-clamp-3 font-body" style={{ color: 'var(--text-primary)' }}>
                 &quot;{item.message}&quot;
               </p>
 
-              {/* Link Preview Card */}
+              {/* Link Preview */}
               <div className="flex items-center rounded-xl overflow-hidden border border-[var(--border)] bg-[var(--secondary)] transition group">
-                {/* Thumbnail */}
                 <div className="w-20 h-20 bg-black/20 flex-shrink-0 relative overflow-hidden">
                   {isValidImageUrl(item.metaImage) ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={item.metaImage}
-                      alt="preview"
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      alt=""
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       loading="lazy"
                       onError={(e) => { e.target.style.display = 'none'; }}
                     />
-) : (
-                    <div className="w-full h-full flex items-center justify-center text-gray-400"><LinkIcon size={24} /></div>
-                   )}
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[var(--text-muted)]">
+                      <LinkIcon size={24} aria-hidden="true" />
+                    </div>
+                  )}
                 </div>
 
-                {/* Link Info */}
                 <div className="p-3 overflow-hidden flex-1">
                   <h3 className="font-bold text-sm truncate group-hover:text-[var(--foreground)] transition">
-                    {item.metaTitle}
+                    {item.metaTitle || item.url}
                   </h3>
                   <p className="text-xs truncate mt-1" style={{ color: 'var(--text-muted)' }}>
                     {(() => {
@@ -668,9 +728,8 @@ if (data.alreadyReported) {
                 </div>
               </div>
 
-{/* View Details Hint */}
-              <div className="mt-3 text-xs text-center flex items-center justify-center gap-1" style={{ color: 'var(--text-muted)' }}>
-                <ArrowUp size={14} /> Click card &quot;View Details&quot;
+              <div className="mt-3 text-xs text-center" style={{ color: 'var(--text-muted)' }}>
+                Open details
               </div>
 
               </div>
@@ -678,87 +737,66 @@ if (data.alreadyReported) {
             </Link>
           ))}
         </div>
+        )}
 
         {/* Footer */}
-        <footer className="mt-16 pt-8 border-t border-white/10 text-center fade-in-up">
-          <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            © {new Date().getFullYear()} SendTheLink • Share knowledge freely
+        <footer className="mt-16 pt-8 border-t border-[var(--border)] text-center fade-in-up">
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+            © {new Date().getFullYear()} Nobody Space
           </p>
 
-          {/* Security Credits */}
-          <div className="flex flex-wrap justify-center gap-4 mt-4">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 mt-5">
             <a
               href="https://www.virustotal.com"
               target="_blank"
               rel="noopener noreferrer"
-className="text-xs hover:text-white transition-colors flex items-center gap-1"
-               style={{ color: 'var(--text-secondary)' }}
-             >
-               <Shield size={14} /> Secured by VirusTotal
-             </a>
-            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>•</span>
+              className="text-xs inline-flex items-center gap-1.5 transition-colors hover:text-[var(--foreground)]"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <Shield size={14} aria-hidden="true" /> VirusTotal
+            </a>
             <a
               href="https://urlscan.io"
               target="_blank"
               rel="noopener noreferrer"
-className="text-xs hover:text-white transition-colors flex items-center gap-1"
-               style={{ color: 'var(--text-secondary)' }}
-             >
-               <SearchCheck size={14} /> Scanned by URLScan.io
-             </a>
-            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>•</span>
+              className="text-xs inline-flex items-center gap-1.5 transition-colors hover:text-[var(--foreground)]"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <SearchCheck size={14} aria-hidden="true" /> URLScan.io
+            </a>
             <a
               href="/analytics-policy"
-className="text-xs hover:text-white transition-colors flex items-center gap-1"
-               style={{ color: 'var(--text-secondary)' }}
-             >
-               <FileSpreadsheet size={14} /> Analytics Policy
-             </a>
-          </div>
-
-          <p className="text-xs mt-4" style={{ color: 'var(--text-muted)' }}>
-            Protected by reCAPTCHA • All links are security scanned
-          </p>
-
-          <p className="text-xs mt-3">
+              className="text-xs inline-flex items-center gap-1.5 transition-colors hover:text-[var(--foreground)]"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <FileSpreadsheet size={14} aria-hidden="true" /> Analytics policy
+            </a>
             <a
               href="mailto:dmca@manji.eu.org"
-              className="hover:text-white transition-colors"
-style={{ color: 'var(--text-secondary)' }}
-              title="Report copyright infringement"
+              className="text-xs inline-flex items-center gap-1.5 transition-colors hover:text-[var(--foreground)]"
+              style={{ color: 'var(--text-secondary)' }}
             >
-              <Mail size={14} className="inline mr-1" /> DMCA Takedown Request
+              <Mail size={14} aria-hidden="true" /> DMCA
             </a>
-            <span className="mx-4" style={{ color: 'var(--text-muted)' }}>•</span>
             <a
               href="https://sociabuzz.com/fanzirfan/donate"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-white transition-colors"
-style={{ color: 'var(--text-secondary)' }}
-              title="Buy me a coffee"
+              className="text-xs inline-flex items-center gap-1.5 transition-colors hover:text-[var(--foreground)]"
+              style={{ color: 'var(--text-secondary)' }}
             >
-              <Coffee size={14} className="inline mr-1" /> Buy me a coffee
+              <Coffee size={14} aria-hidden="true" /> Buy me a coffee
             </a>
+          </div>
+
+          <p className="text-xs mt-5 font-body" style={{ color: 'var(--text-muted)' }}>
+            Links are scanned for malware before they appear. Protected by reCAPTCHA.
           </p>
         </footer>
 
       </div>
 
       <style jsx>{`
-        @keyframes slide-in {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-        .animate-slide-in {
-          animation: slide-in 0.3s ease-out;
-        }
         @keyframes toast-popup {
           from {
             transform: scale(0.8);

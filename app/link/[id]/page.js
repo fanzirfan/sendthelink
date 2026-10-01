@@ -99,6 +99,14 @@ export default function LinkDetailsPage() {
         trackView();
     }, [params.id]);
 
+    // Close the report dialog with Escape
+    useEffect(() => {
+        if (!reportModal) return;
+        const onKey = (e) => { if (e.key === 'Escape') setReportModal(false); };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [reportModal]);
+
     // Handle copy link button
     const handleCopyLink = (url) => {
         if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -206,23 +214,10 @@ export default function LinkDetailsPage() {
 
     if (loading) {
         return (
-            <main className="min-h-screen px-4 md:px-10 py-8 md:py-10 flex items-center justify-center">
-                <div className="glass-card terminal-card overflow-hidden text-center">
-                    <div className="terminal-window-bar">
-                        <div className="terminal-dots">
-                            <span className="terminal-dot red"></span>
-                            <span className="terminal-dot yellow"></span>
-                            <span className="terminal-dot green"></span>
-                        </div>
-                        <span className="terminal-title">sendthelink://detail/loading</span>
-                        <span className="w-8" aria-hidden="true"></span>
-                    </div>
-                    <div className="p-8">
-                    <div className="text-4xl mb-4 text-[var(--foreground)]">
-                        <LoaderCircle className="inline animate-spin" size={36} />
-                    </div>
-                    <p className="text-lg">Loading link details...</p>
-                    </div>
+            <main className="min-h-[100dvh] px-4 md:px-10 py-8 md:py-10 flex items-center justify-center">
+                <div className="glass-card p-8 text-center" aria-live="polite">
+                    <LoaderCircle className="inline animate-spin mb-4" size={36} aria-hidden="true" />
+                    <p className="text-lg font-body" style={{ color: 'var(--text-secondary)' }}>Loading link details...</p>
                 </div>
             </main>
         );
@@ -230,113 +225,87 @@ export default function LinkDetailsPage() {
 
     if (error) {
         return (
-            <main className="min-h-screen px-4 md:px-10 py-8 md:py-10 flex items-center justify-center">
-                <div className="glass-card terminal-card overflow-hidden text-center max-w-md w-full">
-                    <div className="terminal-window-bar">
-                        <div className="terminal-dots">
-                            <span className="terminal-dot red"></span>
-                            <span className="terminal-dot yellow"></span>
-                            <span className="terminal-dot green"></span>
-                        </div>
-                        <span className="terminal-title">sendthelink://detail/error</span>
-                        <span className="w-8" aria-hidden="true"></span>
-                    </div>
-                    <div className="p-8">
-                    <div className="text-5xl mb-4 text-[var(--foreground)]">
-                        <Frown size={48} className="inline" />
-                    </div>
-                    <h1 className="text-2xl font-bold mb-4">Oops!</h1>
-                    <p className="text-lg mb-6" style={{ color: 'var(--text-secondary)' }}>{error}</p>
-                    <Link href="/" className="btn-glass inline-block">
-                        <ArrowLeft size={16} className="inline mr-2" /> Back to Home
+            <main className="min-h-[100dvh] px-4 md:px-10 py-8 md:py-10 flex items-center justify-center">
+                <div className="glass-card p-8 text-center max-w-md w-full">
+                    <Frown size={48} className="inline mb-4" style={{ color: 'var(--text-muted)' }} aria-hidden="true" />
+                    <h1 className="text-2xl font-bold mb-2">Link not found</h1>
+                    <p className="text-base mb-6 font-body" style={{ color: 'var(--text-secondary)' }}>{error}</p>
+                    <Link href="/" className="btn-glass inline-flex items-center gap-2">
+                        <ArrowLeft size={16} aria-hidden="true" /> Back to all links
                     </Link>
-                    </div>
                 </div>
             </main>
         );
     }
 
     return (
-        <main className="min-h-screen px-4 md:px-10 py-8 md:py-10">
+        <main className="min-h-[100dvh] px-4 md:px-10 py-8 md:py-10">
             <div className="max-w-4xl mx-auto">
 
                 {/* Toast Notification */}
                 {toast && (
-                    <div className={`fixed top-4 right-4 z-50 glass-card p-4 max-w-md animate-slide-in ${toast.type === 'error' ? 'border-red-500' :
-                        toast.type === 'success' ? 'border-green-500' :
-                            toast.type === 'warning' ? 'border-yellow-500' :
-                                'border-blue-500'
-                        } border-l-4`}>
+                    <div className={`fixed top-4 right-4 z-50 glass-card p-4 max-w-md animate-slide-in border-l-4 ${toast.type === 'error' ? 'border-l-red-400' :
+                        toast.type === 'success' ? 'border-l-[var(--primary)]' :
+                            toast.type === 'warning' ? 'border-l-amber-400' :
+                                'border-l-[var(--border)]'
+                        }`}>
                         <p className="text-sm whitespace-pre-line">{toast.message}</p>
                     </div>
                 )}
 
                 {/* Report Modal */}
                 {reportModal && (
-                    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                        <div className="glass-card terminal-card overflow-hidden max-w-md w-full">
-                            <div className="terminal-window-bar">
-                                <div className="terminal-dots">
-                                    <span className="terminal-dot red"></span>
-                                    <span className="terminal-dot yellow"></span>
-                                    <span className="terminal-dot green"></span>
-                                </div>
-                                <span className="terminal-title">sendthelink://detail/report</span>
-                                <span className="w-8" aria-hidden="true"></span>
-                            </div>
-                            <div className="p-6">
-                            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
-                                <Flag size={20} className="text-red-500" /> Report Inappropriate Content
+                    <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+                        <div
+                            className="glass-card p-6 max-w-md w-full"
+                            role="dialog"
+                            aria-modal="true"
+                            aria-labelledby="detail-report-title"
+                        >
+                            <h3 id="detail-report-title" className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <Flag size={20} style={{ color: 'var(--danger, #f87171)' }} aria-hidden="true" /> Report link
                             </h3>
-                            <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                                Please tell us why you&apos;re reporting this link:
-                            </p>
+                            <label htmlFor="detail-report-reason" className="block text-sm mb-1 font-body" style={{ color: 'var(--text-secondary)' }}>
+                                Reason
+                            </label>
                             <textarea
+                                id="detail-report-reason"
                                 value={reportReason}
                                 onChange={(e) => setReportReason(e.target.value)}
-                                placeholder="e.g., spam, inappropriate content, scam..."
+                                placeholder="Spam, scam, malware, copyright..."
                                 className="input-glass w-full resize-none mb-4"
                                 rows="4"
                                 autoFocus
                             />
                             <div className="flex gap-3">
                                 <button
+                                    type="button"
                                     onClick={submitReport}
                                     className="btn-glass flex-1"
                                 >
-                                    Submit Report
+                                    Submit report
                                 </button>
                                 <button
+                                    type="button"
                                     onClick={() => setReportModal(false)}
-                                    className="px-6 py-3 rounded-lg bg-white/10 hover:bg-white/20 transition font-semibold"
+                                    className="px-6 py-3 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-semibold"
                                 >
                                     Cancel
                                 </button>
-                            </div>
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* Back Button */}
                 <Link
                     href="/"
-                    className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition font-semibold fade-in-up"
+                    className="inline-flex items-center gap-2 mb-8 px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-semibold fade-in-up"
                 >
-                    <ArrowLeft size={16} /> Back to Home
+                    <ArrowLeft size={16} aria-hidden="true" /> All links
                 </Link>
 
                 {/* Main Content Card */}
-                <div className="glass-card terminal-card fade-in-up overflow-hidden" style={{ animationDelay: '0.1s' }}>
-                    <div className="terminal-window-bar">
-                        <div className="terminal-dots">
-                            <span className="terminal-dot red"></span>
-                            <span className="terminal-dot yellow"></span>
-                            <span className="terminal-dot green"></span>
-                        </div>
-                        <span className="terminal-title">sendthelink://detail/{params.id || 'unknown'}</span>
-                        <span className="w-8" aria-hidden="true"></span>
-                    </div>
+                <div className="glass-card fade-in-up overflow-hidden" style={{ animationDelay: '0.1s' }}>
                     <div className="p-6 md:p-8">
 
                     {/* Header */}
@@ -355,34 +324,33 @@ export default function LinkDetailsPage() {
                             </div>
                         </div>
                         <div className="flex gap-2 flex-wrap">
-                            {/* Share Button */}
                             <button
+                                type="button"
                                 onClick={handleSharePage}
-                                className="text-base px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-bold"
-                                title="Share this page"
+                                className="text-sm px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-semibold inline-flex items-center gap-2"
                             >
-                                <LinkIcon size={16} className="inline mr-2" /> Share
+                                <LinkIcon size={16} aria-hidden="true" /> Share
                             </button>
                             <button
+                                type="button"
                                 onClick={() => handleCopyLink(linkData.url)}
-                                className="text-base px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-bold"
-                                title="Copy original link to clipboard"
+                                className="text-sm px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--secondary)] hover:border-[var(--ring)] transition font-semibold inline-flex items-center gap-2"
                             >
-                                <Copy size={16} className="inline mr-2" /> Copy Link
+                                <Copy size={16} aria-hidden="true" /> Copy link
                             </button>
                             <button
+                                type="button"
                                 onClick={() => setReportModal(true)}
-                                className="text-base px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 transition font-bold"
-                                title="Report inappropriate content"
+                                className="text-sm px-4 py-2 rounded-lg border border-red-500/35 bg-red-500/15 hover:bg-red-500/25 transition font-semibold inline-flex items-center gap-2"
                             >
-                                <Flag size={16} className="inline mr-2" /> Report
+                                <Flag size={16} aria-hidden="true" /> Report
                             </button>
                         </div>
                     </div>
 
                     {/* Date */}
-                    <div className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
-                        <Clock size={14} className="inline mr-2" /> {formatDate(linkData.createdAt)}
+                    <div className="text-sm mb-6 inline-flex items-center gap-2 font-body" style={{ color: 'var(--text-muted)' }}>
+                        <Clock size={14} aria-hidden="true" /> {formatDate(linkData.createdAt)}
                     </div>
 
                     {/* Tags */}
@@ -392,7 +360,7 @@ export default function LinkDetailsPage() {
                                 const tag = AVAILABLE_TAGS.find(t => t.id === tagId);
                                 return tag ? (
                                     <span key={tagId} className="tag-display text-sm px-3 py-1">
-                                        <tag.icon size={14} className="inline mr-1" /> {tag.label}
+                                        <tag.icon size={14} className="inline mr-1" aria-hidden="true" /> {tag.label}
                                     </span>
                                 ) : null;
                             })}
@@ -402,9 +370,9 @@ export default function LinkDetailsPage() {
                     {/* Message */}
                     <div className="mb-8">
                         <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
-                            <FileText size={14} className="inline mr-2" /> Message
+                            <FileText size={14} className="inline mr-2" aria-hidden="true" /> Message
                         </h2>
-                        <p className="text-lg leading-relaxed" style={{ color: 'var(--text-primary)' }}>
+                        <p className="text-lg leading-relaxed font-body" style={{ color: 'var(--text-primary)' }}>
                             &quot;{linkData.message}&quot;
                         </p>
                     </div>
@@ -412,7 +380,7 @@ export default function LinkDetailsPage() {
                     {/* Link Preview Card */}
                     <div className="mb-6">
                         <h2 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>
-                            <LinkIcon size={14} className="inline mr-2" /> Link
+                            <LinkIcon size={14} className="inline mr-2" aria-hidden="true" /> Link
                         </h2>
                         <a
                             href={linkData.url}
@@ -426,7 +394,7 @@ export default function LinkDetailsPage() {
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
                                         src={linkData.metaImage}
-                                        alt="preview"
+                                        alt=""
                                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                                         onError={(e) => { e.target.style.display = 'none'; }}
                                     />
@@ -435,10 +403,10 @@ export default function LinkDetailsPage() {
 
                             {/* Link Info */}
                             <div className="p-4">
-                                <h3 className="font-bold text-lg md:text-xl group-hover:text-[var(--foreground)] transition mb-2">
+                                <h3 className="font-semibold text-base group-hover:text-[var(--foreground)] transition">
                                     {linkData.metaTitle || linkData.url}
                                 </h3>
-                                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                                <p className="text-sm font-body mt-1" style={{ color: 'var(--text-muted)' }}>
                                     {(() => {
                                         try {
                                             return new URL(linkData.url).hostname;
@@ -456,18 +424,17 @@ export default function LinkDetailsPage() {
                         href={linkData.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="btn-glass w-full text-center text-lg font-bold block"
+                        className="btn-glass w-full text-center text-base font-bold flex items-center justify-center gap-2"
                     >
-                        <ExternalLink size={18} className="inline mr-2" /> Open Link
+                        Open link <ExternalLink size={18} aria-hidden="true" />
                     </a>
 
                     </div>
                 </div>
 
-                {/* Footer */}
-                <footer className="mt-12 pt-8 border-t border-white/10 text-center fade-in-up">
-                    <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-                        © {new Date().getFullYear()} SendTheLink • Share knowledge freely
+                <footer className="mt-12 pt-8 border-t border-[var(--border)] text-center fade-in-up">
+                    <p className="text-sm font-body" style={{ color: 'var(--text-secondary)' }}>
+                        © {new Date().getFullYear()} Nobody Space
                     </p>
                 </footer>
 
