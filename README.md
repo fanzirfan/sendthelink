@@ -248,7 +248,7 @@ Contributions are welcome! Please:
 
 ## 📝 License
 
-This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file.
+This project is licensed under the **MIT License** (Copyright (c) 2026 Nobody Space) - see [LICENSE](LICENSE) file.
 
 ---
 
@@ -295,4 +295,4 @@ This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file
 
 ---
 
-Made with ❤️ by [FanzYB](https://github.com/fanzyb)
+Made with ❤️ by Nobody Space
