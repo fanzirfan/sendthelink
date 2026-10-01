@@ -2,10 +2,13 @@
 // Force Node.js runtime instead of Edge runtime for Firebase compatibility
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// The post-response scan polls the providers for a verdict.
+export const maxDuration = 60;
 
-import { NextResponse } from 'next/server';
+import { NextResponse, after } from 'next/server';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../../lib/firebase';
+import { scanLinkById, resolvePendingLinks } from '../../../lib/linkScan';
 
 export async function POST(request) {
     try {
@@ -63,18 +66,19 @@ export async function POST(request) {
 
         const docRef = await addDoc(collection(db, 'shared_links'), linkData);
 
-        // Trigger async security scan (non-blocking)
-        // We use fetch to call our own API endpoint to run scan in background
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
-            process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` :
-            'http://localhost:3000';
-
-        // Fire and forget - don't await
-        fetch(`${baseUrl}/api/scan`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ linkId: docRef.id, url: cleanURL })
-        }).catch(err => console.error('Failed to trigger security scan:', err));
+        // Scan after the response is sent. `after` keeps the invocation alive
+        // for the work, unlike a fire-and-forget fetch that a serverless host
+        // may tear down before the request leaves the process.
+        after(async () => {
+            try {
+                // Drain older stragglers first (cheap, no polling), then poll
+                // this submission so under real traffic nothing stays pending.
+                await resolvePendingLinks({ max: 2 });
+                await scanLinkById(docRef.id, { poll: true });
+            } catch (error) {
+                console.error('Background security scan failed:', error);
+            }
+        });
 
         return NextResponse.json({
             success: true,

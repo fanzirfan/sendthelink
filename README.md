@@ -50,10 +50,24 @@
 - Search functionality
 - Stats overview (Total, Reported, Flagged, Security Review, Verified)
 
-### �️ **Security Scanning**
-- **Async scanning** - Links are scanned in background after submission
-- **Security Status**: Safe ✅ | Suspicious ⚠️ | Malicious 🚨 | Pending 🔄
+### 🛡️ **Security Scanning**
+- **Post-submission scanning** - Links are scanned after the response is sent, so submitting stays instant
+- **Security Status**: Safe ✅ | Suspicious ⚠️ | Malicious 🚨 | Pending 🔄 | Scan failed ❗
 - **Powered by**: VirusTotal & URLScan.io
+- **Fail-closed** - a verdict of `safe` requires a completed scan from at least one provider with nothing left pending. Missing API keys, rate limits, and provider errors all leave the link at `pending` rather than reporting it clean.
+- **Self-healing** - a scan is polled for up to 45s; anything still unresolved is retried by the next submission and by the daily cron (`GET /api/scan`). A scan that never settles is recorded as `error` after 10 attempts.
+
+Both `VIRUSTOTAL_API_KEY` and `URLSCAN_API_KEY` are required. If either is missing, scans stay `pending` forever by design.
+
+Manual backlog drain (needs an admin token or `CRON_SECRET`):
+
+```bash
+curl -H "Authorization: Bearer $CRON_SECRET" "https://your-site/api/scan?max=2&poll=1"
+curl -X POST -H "Authorization: Bearer $CRON_SECRET" -H "Content-Type: application/json" \
+  -d '{"linkId":"<firestore doc id>"}' https://your-site/api/scan
+```
+
+`max` is the batch size (1-25), `poll=1` waits for each verdict and splits the function budget across the batch.
 
 ### 🔗 **Link Details Page**
 - Dedicated page for each shared link (`/link/[id]`)
@@ -121,6 +135,10 @@ ADMIN_PASSWORD=your_secure_admin_password
 
 # Verified User System
 VERIFIED_USER_PASSWORD=your_secret_verification_password
+
+# Internal scan secret (authorizes GET/POST /api/scan; falls back to ADMIN_PASSWORD)
+# Vercel Cron sends this automatically as "Authorization: Bearer $CRON_SECRET"
+CRON_SECRET=your_random_scan_secret
 
 # Configuration
 FILTER_WHITELIST_MODE=false
@@ -204,7 +222,9 @@ sendthelink/
 │   ├── layout.js         # Root layout
 │   └── page.js           # Homepage
 ├── lib/                   # Utilities
-│   └── firebase.js       # Firebase config
+│   ├── firebase.js       # Firebase config
+│   ├── linkScan.js       # Scan a stored link and persist the verdict
+│   └── urlScanner.js     # VirusTotal + URLScan.io clients
 └── public/               # Static assets
 ```
 

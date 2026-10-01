@@ -1,84 +1,76 @@
 // app/api/scan/route.js
-// Background security scan endpoint - Called async after link submission
+// Security scan endpoint.
+//   POST { linkId } - scan one link now (admin token or scan secret required).
+//   GET             - drain links left in 'pending' (cron target).
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+// Scanning polls the providers for a verdict; allow the full function budget.
+export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../../lib/firebase';
-import { checkURLSecurity } from '../../../lib/urlScanner';
+import { verifyScanRequest } from '../../../lib/adminAuth';
+import { scanLinkById, resolvePendingLinks } from '../../../lib/linkScan';
+import { getIP, scanLimiter } from '../../../lib/rateLimit';
 
 export async function POST(request) {
+    if (!verifyScanRequest(request)) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
-        const { linkId, url } = await request.json();
+        await scanLimiter.check(request, 15, getIP(request));
+    } catch (rateLimitError) {
+        return NextResponse.json(
+            { error: 'Too many scan requests', retryAfter: rateLimitError.retryAfter },
+            { status: 429, headers: { 'Retry-After': String(rateLimitError.retryAfter) } }
+        );
+    }
 
-        if (!linkId || !url) {
-            return NextResponse.json({ error: 'Missing linkId or url' }, { status: 400 });
-        }
+    // Read the body once: the handler must not consume the stream twice.
+    let payload;
+    try {
+        payload = await request.json();
+    } catch {
+        return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+    }
 
-        console.log(`[Security Scan] Starting scan for link ${linkId}: ${url}`);
+    const linkId = payload?.linkId;
+    if (!linkId || typeof linkId !== 'string') {
+        return NextResponse.json({ error: 'Missing linkId' }, { status: 400 });
+    }
 
-        // Run the security scan
-        const scanResult = await checkURLSecurity(url);
+    // The URL is read from the stored document, never from the caller, so this
+    // endpoint cannot be used to scan arbitrary third-party URLs.
+    const result = await scanLinkById(linkId, { poll: true });
 
-        console.log('[Security Scan] Result for link:', linkId, {
-            status: scanResult.securityStatus,
-            duration: scanResult.scanDuration
+    if (!result.ok) {
+        return NextResponse.json({ error: result.error }, { status: result.status || 500 });
+    }
+
+    return NextResponse.json({ success: true, ...result.summary });
+}
+
+export async function GET(request) {
+    if (!verifyScanRequest(request)) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const params = request.nextUrl?.searchParams;
+    const requestedMax = Number(params?.get('max')) || 10;
+    const max = Math.min(Math.max(requestedMax, 1), 25);
+    // `poll=1` waits for a verdict per link, so split the function budget
+    // across the batch instead of letting one link eat the whole invocation.
+    const poll = params?.get('poll') === '1';
+
+    try {
+        const report = await resolvePendingLinks({
+            max,
+            poll,
+            ...(poll ? { budgetMs: Math.floor(50000 / max) } : {})
         });
-
-        // Determine the final status based on security scan
-        // If malicious or suspicious, change link status to 'pending_review' so it won't show publicly
-        let newStatus = 'approved';
-        if (scanResult.securityStatus === 'malicious' || scanResult.securityStatus === 'suspicious') {
-            newStatus = 'pending_review'; // Admin needs to review
-        }
-
-        // Update the link document with scan results
-        const linkRef = doc(db, 'shared_links', linkId);
-        await updateDoc(linkRef, {
-            securityStatus: scanResult.securityStatus,
-            securityScan: {
-                virusTotal: scanResult.virusTotal || null,
-                urlScan: scanResult.urlScan || null,
-                scannedAt: scanResult.scannedAt,
-                duration: scanResult.scanDuration
-            },
-            // Update status if security concern found
-            ...(newStatus !== 'approved' && { status: newStatus })
-        });
-
-        console.log(`[Security Scan] Updated link ${linkId} with status: ${scanResult.securityStatus}`);
-
-        return NextResponse.json({
-            success: true,
-            linkId,
-            securityStatus: scanResult.securityStatus,
-            linkStatus: newStatus
-        });
-
+        return NextResponse.json({ success: true, ...report });
     } catch (error) {
-        console.error('[Security Scan] Error:', error);
-
-        // Even on error, try to update the link to mark scan as failed
-        try {
-            const { linkId } = await request.clone().json();
-            if (linkId) {
-                const linkRef = doc(db, 'shared_links', linkId);
-                await updateDoc(linkRef, {
-                    securityStatus: 'error',
-                    securityScan: {
-                        error: error.message,
-                        scannedAt: new Date().toISOString()
-                    }
-                });
-            }
-        } catch (updateError) {
-            console.error('[Security Scan] Failed to update error status:', updateError);
-        }
-
-        return NextResponse.json({
-            error: 'Security scan failed',
-            details: error.message
-        }, { status: 500 });
+        console.error('[Security Scan] Pending resolution failed:', error);
+        return NextResponse.json({ error: 'Failed to resolve pending scans' }, { status: 500 });
     }
 }

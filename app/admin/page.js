@@ -622,7 +622,8 @@ const handleLogout = () => {
                                                     {link.securityStatus === 'malicious' ? '🚨' :
                                                         link.securityStatus === 'suspicious' ? '⚠️' :
                                                             link.securityStatus === 'safe' ? '✅' :
-                                                                link.securityStatus === 'pending' ? '🔄' : '❓'}
+                                                                link.securityStatus === 'pending' ? '🔄' :
+                                                                    link.securityStatus === 'error' ? '❗' : '❓'}
                                                 </span>
                                                 <span className={`px-2 py-0.5 rounded text-xs ${link.status === 'flagged' ? 'bg-red-500/20 text-red-300' :
                                                     link.status === 'rejected' ? 'bg-gray-500/20 text-gray-300' :
@@ -777,7 +778,8 @@ link.tags.slice(0, 2).map(tagId => {
                                                             link.securityStatus === 'suspicious' ? <><AlertTriangle size={12} className="inline mr-1" /> Suspicious</> :
                                                                 link.securityStatus === 'safe' ? <><CheckCircle size={12} className="inline mr-1" /> Safe</> :
                                                                     link.securityStatus === 'pending' ? <><RefreshCw size={12} className="inline mr-1 animate-spin" /> Scanning</> :
-                                                                        '? Unknown'}
+                                                                        link.securityStatus === 'error' ? <><AlertTriangle size={12} className="inline mr-1" /> Scan failed</> :
+                                                                            '? Unknown'}
                                                     </span>
                                                 </td>
                                                 <td className="p-3 text-sm">
